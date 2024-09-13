@@ -1,0 +1,63 @@
+﻿@implements IDialogContentComponent<GraphItem>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentSelect Items=@dataTypeOptions
+                      OptionText="@(i => i.Text)"
+                      OptionValue="@(i => i.Value)"
+                      OptionSelected="@(i => i.Selected)"
+                          @bind-Value="@Content.DataType" />
+
+        <FluentSelect TOption="ApexCharts.SeriesType" Label="Chart type">
+            @foreach (ApexCharts.SeriesType item in Enum.GetValues<ApexCharts.SeriesType>())
+            {
+                <FluentOption Value="@item.ToString()">@item</FluentOption>
+            }
+        </FluentSelect>
+
+        <FluentTextField @bind-Value="@Content.Name">Graph title:</FluentTextField>
+    </FluentStack>
+</FluentDialogBody>
+
+@code {
+    [Parameter]
+    public GraphItem Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    private List<Option<string>> dataTypeOptions = new()
+    {
+        { new Option<string> { Value = "DistanceReading", Text = "Distance" }},
+        { new Option<string> { Value = "LuminosityReading", Text = "Luminosity" }},
+        { new Option<string> { Value = "TemperatureReading", Text = "Temperature" }},
+        { new Option<string> { Value = "VelocityReading", Text = "Velocity" }}
+    };
+
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+}

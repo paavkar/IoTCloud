@@ -1,0 +1,156 @@
+﻿@page "/dashboard"
+@rendermode InteractiveServer
+
+@inject IdentityUserAccessor UserAccessor
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject ClipboardService ClipboardService
+@inject IDialogService DialogService
+@inject ITemperatureReadingsService TRS
+
+@attribute [Authorize]
+
+<PageTitle>Dashboard</PageTitle>
+
+<FluentLabel Typo="Typography.H3">Dashboard</FluentLabel>
+
+<FluentStack Style="margin-top: 1em;">
+    <FluentButton Style="margin-top: 0.6em;" BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="CreateApiKey">Create new API Key</FluentButton>
+    @if (ApiKey is not null)
+    {
+        <FluentAccordion Style="margin-left: 1em; width: 40%;">
+            <FluentAccordionItem Style="background-color: green;" Heading="Your API key">
+                @ApiKey
+                <FluentIcon Id="apiKeyTooltipIcon" OnClick="CopyToClipboard" Style="cursor: pointer;" Icon="Icons.Regular.Size20.Copy" />
+                <FluentTooltip Anchor="apiKeyTooltipIcon">Click to copy API key.</FluentTooltip>
+            </FluentAccordionItem>
+        </FluentAccordion>
+    }
+    else
+    {
+        <FluentLabel Style="margin-left: 1em;">You do not have an existing API key. Click the button to create one.</FluentLabel>
+    }
+</FluentStack>
+
+<FluentDivider Style="margin-top: 1em;" />
+
+<FluentLabel Typo="Typography.H3">Sensor data</FluentLabel>
+
+<FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
+    <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+
+    <FluentStack>
+            @foreach (var item in Graphs)
+            {
+                switch(item.DataType)
+                {
+                    case "DistanceReading":
+                            <ApexCharts.ApexChart TItem="DistanceReading"
+                                                  Title=@item.Name>
+                                <ApexCharts.ApexPointSeries TItem="DistanceReading"
+                                                            Items="DistanceReadings"
+                                                            SeriesType=item.GraphType
+                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                            YValue="i => (decimal)i.Distance" />
+                            </ApexCharts.ApexChart>
+                        break;
+                    case "LuminosityReading":
+                            <ApexCharts.ApexChart TItem="LuminosityReading"
+                                                  Title=@item.Name>
+                                <ApexCharts.ApexPointSeries TItem="LuminosityReading"
+                                                            Items="LuminosityReadings"
+                                                            SeriesType=item.GraphType
+                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                            YValue="i => (decimal)i.Luminosity" />
+                            </ApexCharts.ApexChart>
+                        break;
+                    case "TemperatureReading":
+                            <ApexCharts.ApexChart TItem="TemperatureReading"
+                                                  Title=@item.Name>
+                                <ApexCharts.ApexPointSeries TItem="TemperatureReading"
+                                                            Items="TemperatureReadings"
+                                                            SeriesType=item.GraphType
+                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                            YValue="i => (decimal)i.Temperature" />
+                            </ApexCharts.ApexChart>
+                        break;
+                    case "VelocityReading":
+                            <ApexCharts.ApexChart TItem="VelocityReading"
+                                                  Title=@item.Name>
+                                <ApexCharts.ApexPointSeries TItem="VelocityReading"
+                                                            Items="VelocityReadings"
+                                                            SeriesType=item.GraphType
+                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                            YValue="i => (decimal)i.Velocity" />
+                            </ApexCharts.ApexChart>
+                        break;
+                }
+                
+            }
+    </FluentStack>
+</FluentStack>
+
+
+@code {
+    private ApplicationUser user = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private string? ApiKey { get; set; }
+
+    CancellationTokenSource cts = new();
+
+    private List<GraphItem> Graphs { get; set; } = new();
+    private List<DistanceReading> DistanceReadings { get; set; } = new();
+    private List<LuminosityReading> LuminosityReadings { get; set; } = new();
+    private List<TemperatureReading> TemperatureReadings { get; set; } = new();
+    private List<VelocityReading> VelocityReadings { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        ApiKey = await UserService.GetUserApiKey(user.Id);
+    }
+
+    public async void CreateApiKey()
+    {
+        var key = await UserService.SetUserApiKey(user.Id);
+
+        ApiKey = key.ApiKeyId;
+        StateHasChanged();
+    }
+
+    public async void AddGraph()
+    {
+        var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
+            {
+                Height = "300px",
+                Title = $"Add a new data graph",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            GraphItem item = (GraphItem)result.Data;
+
+            if (item.DataType == "TemperatureReading") TemperatureReadings = await TRS.GetTemperatureReadings(user.Id);
+            Graphs.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    async Task CopyToClipboard()
+    {
+        await ClipboardService.WriteTextAsync(ApiKey);
+        await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
+    }
+
+    public void Dispose()
+    {
+        cts.Cancel(); // Cancel Task.Delay
+        cts.Dispose();
+    }
+}
