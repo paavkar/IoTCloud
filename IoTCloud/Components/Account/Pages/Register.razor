@@ -72,9 +72,18 @@
             return;
         }
 
-        var userRoleExists = await RoleManager.RoleExistsAsync("User");
-        if (!userRoleExists) await RoleManager.CreateAsync(new IdentityRole("User"));
-        await UserManager.AddToRoleAsync(user, "User");
+        if (Input.Email == "paavo_karppinen@outlook.com")
+        {
+            var adminRoleExists = await RoleManager.RoleExistsAsync("Admin");
+            if (!adminRoleExists) await RoleManager.CreateAsync(new IdentityRole("Admin"));
+            await UserManager.AddToRoleAsync(user, "Admin");
+        }
+        else
+        {
+            var userRoleExists = await RoleManager.RoleExistsAsync("User");
+            if (!userRoleExists) await RoleManager.CreateAsync(new IdentityRole("User"));
+            await UserManager.AddToRoleAsync(user, "User");
+        }
 
         Logger.LogInformation("User created a new account with password.");
 

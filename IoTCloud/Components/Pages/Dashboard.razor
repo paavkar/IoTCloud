@@ -6,7 +6,8 @@
 @inject IUserService UserService
 @inject ClipboardService ClipboardService
 @inject IDialogService DialogService
-@inject ITemperatureReadingsService TRS
+@inject IReadingsService RS
+@inject IGraphsService GS
 
 @attribute [Authorize]
 
@@ -85,7 +86,6 @@
                             </ApexCharts.ApexChart>
                         break;
                 }
-                
             }
     </FluentStack>
 </FluentStack>
@@ -93,9 +93,6 @@
 
 @code {
     private ApplicationUser user = default!;
-
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
 
     private string? ApiKey { get; set; }
 
@@ -111,6 +108,31 @@
     {
         user = await UserAccessor.GetRequiredUserAsync();
         ApiKey = await UserService.GetUserApiKey(user.Id);
+
+        Graphs = await GS.GetUserGraphs(user.Id);
+        foreach (var graph in Graphs)
+        {
+            await GetReadings(graph);
+        }
+    }
+
+    private async Task GetReadings(GraphItem item)
+    {
+        switch (item.DataType)
+        {
+            case "DistanceReading":
+                DistanceReadings = await RS.GetDistanceReadings(user.Id);
+                break;
+            case "LuminosityReading":
+                LuminosityReadings = await RS.GetLuminosityReadings(user.Id);
+                break;
+            case "TemperatureReading":
+                TemperatureReadings = await RS.GetTemperatureReadings(user.Id);
+                break;
+            case "VelocityReading":
+                VelocityReadings = await RS.GetVelocityReadings(user.Id);
+                break;
+        }
     }
 
     public async void CreateApiKey()
@@ -136,7 +158,9 @@
         {
             GraphItem item = (GraphItem)result.Data;
 
-            if (item.DataType == "TemperatureReading") TemperatureReadings = await TRS.GetTemperatureReadings(user.Id);
+            await GS.AddUserGraph(item, user.Id);
+
+            await GetReadings(item);
             Graphs.Add(item);
             StateHasChanged();
         }

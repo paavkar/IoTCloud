@@ -5,16 +5,16 @@ namespace IoTCloud.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TemperatureController(IReadingsService readingsService, IUserService userService) : ControllerBase
+    public class VelocityController(IReadingsService readingsService, IUserService userService) : ControllerBase
     {
         [HttpGet("add")]
-        public async Task<IActionResult> AddReading(string apiKey, float temperature)
+        public async Task<IActionResult> AddReading(string apiKey, float velocity)
         {
             var existingKey = await userService.CheckApiKeyExistsAsync(apiKey);
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
 
-            var isOperationSuccessful = await readingsService.AddTemperatureReading(temperature, existingKey.UserId, DateTime.Now);
+            var isOperationSuccessful = await readingsService.AddVelocityReading(velocity, existingKey.UserId, DateTime.Now);
 
             if (!isOperationSuccessful)
             {

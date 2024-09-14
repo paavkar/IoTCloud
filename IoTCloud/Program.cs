@@ -22,9 +22,10 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITemperatureReadingsService, TemperatureReadingsService>();
+builder.Services.AddScoped<IReadingsService, ReadingsService>();
 builder.Services.AddScoped<ClipboardService>();
 builder.Services.AddScoped<ITooltipService, TooltipService>();
+builder.Services.AddScoped<IGraphsService, GraphsService>();
 
 builder.Services.AddAuthentication(options =>
     {
