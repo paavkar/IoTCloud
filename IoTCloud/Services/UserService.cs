@@ -1,5 +1,7 @@
-﻿using IoTCloud.Data;
+﻿using Dapper;
+using IoTCloud.Data;
 using IoTCloud.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
@@ -16,12 +18,29 @@ namespace IoTCloud.Services
             _configuration = configuration;
         }
 
+        private SqlConnection GetConnection()
+        {
+            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        }
+
         public async Task<ApiKey?> CheckApiKeyExistsAsync(string apiKey)
         {
-            Console.WriteLine(apiKey);
             var existingKey = await _context.ApiKeys.FirstOrDefaultAsync(ak => ak.ApiKeyId == apiKey);
 
             return existingKey;
+        }
+
+        public async Task<bool> DeleteUserApiKeyAsync(string apiKey)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE ak
+                        FROM ApiKeys ak
+                        WHERE ak.ApiKeyId = @ApiKey";
+
+            var affected = await connection.ExecuteAsync(sql, new { ApiKey = apiKey });
+
+            return affected > 0 ? true : false;
         }
 
         public async Task<string?> GetUserApiKey(string userId)

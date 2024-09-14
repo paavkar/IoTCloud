@@ -7,5 +7,6 @@ namespace IoTCloud.Services
         Task<ApiKey?> CheckApiKeyExistsAsync(string apiKey);
         Task<string?> GetUserApiKey(string userId);
         Task<ApiKey> SetUserApiKey(string userId);
+        Task<bool> DeleteUserApiKeyAsync(string apiKey);
     }
 }

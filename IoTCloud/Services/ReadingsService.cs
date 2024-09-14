@@ -1,5 +1,7 @@
-﻿using IoTCloud.Data;
+﻿using Dapper;
+using IoTCloud.Data;
 using IoTCloud.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace IoTCloud.Services
@@ -13,6 +15,11 @@ namespace IoTCloud.Services
         {
             _context = context;
             _configuration = configuration;
+        }
+
+        private SqlConnection GetConnection()
+        {
+            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         }
 
         public async Task<bool> AddDistanceReading(float distance, string userId, DateTime timeOfMeasurement)
@@ -89,6 +96,58 @@ namespace IoTCloud.Services
             var readings = await _context.VelocityReadings.Where(tr => tr.UserId == userId).ToListAsync();
 
             return readings;
+        }
+
+        public async Task<bool> RemoveDistanceReadings(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE dr
+                        FROM DistanceReadings dr
+                        WHERE dr.UserId = @UserId";
+
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return affected > 0 ? true : false;
+        }
+
+        public async Task<bool> RemoveLuminosityReadings(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE lr
+                        FROM LuminosityReadings lr
+                        WHERE dr.UserId = @UserId";
+
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return affected > 0 ? true : false;
+        }
+
+        public async Task<bool> RemoveTemperatureReadings(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE tr
+                        FROM TemperatureReadings tr
+                        WHERE dr.UserId = @UserId";
+
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return affected > 0 ? true : false;
+        }
+
+        public async Task<bool> RemoveVelocityReadings(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE vr
+                        FROM VelocityReadings vr
+                        WHERE dr.UserId = @UserId";
+
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return affected > 0 ? true : false;
         }
     }
 }

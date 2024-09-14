@@ -1,13 +1,16 @@
 ﻿@page "/dashboard"
 @rendermode InteractiveServer
 
+@implements IDisposable
+
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
-@inject IUserService UserService
 @inject ClipboardService ClipboardService
+@inject IUserService UserService
 @inject IDialogService DialogService
 @inject IReadingsService RS
 @inject IGraphsService GS
+@inject IToastService ToastService
 
 @attribute [Authorize]
 
@@ -26,6 +29,8 @@
                 <FluentTooltip Anchor="apiKeyTooltipIcon">Click to copy API key.</FluentTooltip>
             </FluentAccordionItem>
         </FluentAccordion>
+
+        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="DeleteApiKey">Delete your API key.</FluentButton>
     }
     else
     {
@@ -38,7 +43,25 @@
 <FluentLabel Typo="Typography.H3">Sensor data</FluentLabel>
 
 <FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
-    <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+    <FluentStack>
+        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+        @if (DistanceReadings.Any())
+        {
+            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveDistanceReadings">Remove Distance Readings</FluentButton>
+        }
+        @if (LuminosityReadings.Any())
+        {
+            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveLuminosityReadings">Remove Luminosity Readings</FluentButton>
+        }
+        @if (TemperatureReadings.Any())
+        {
+            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveTemperatureReadings">Remove Temperature Readings</FluentButton>
+        }
+        @if (VelocityReadings.Any())
+        {
+            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveVelocityReadings">Remove Velocity Readings</FluentButton>
+        }
+    </FluentStack>
 
     <FluentStack>
             @foreach (var item in Graphs)
@@ -74,6 +97,7 @@
                                                             XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                             YValue="i => (decimal)i.Temperature" />
                             </ApexCharts.ApexChart>
+                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
                         break;
                     case "VelocityReading":
                             <ApexCharts.ApexChart TItem="VelocityReading"
@@ -104,6 +128,8 @@
     private List<TemperatureReading> TemperatureReadings { get; set; } = new();
     private List<VelocityReading> VelocityReadings { get; set; } = new();
 
+    private Timer? timer;
+
     protected override async Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync();
@@ -114,6 +140,15 @@
         {
             await GetReadings(graph);
         }
+
+        timer = new (async _ =>
+        {
+            foreach (var graph in Graphs)
+            {
+                await GetReadings(graph);
+            }
+            await InvokeAsync(StateHasChanged);
+        }, null, 0, 15000);
     }
 
     private async Task GetReadings(GraphItem item)
@@ -166,9 +201,71 @@
         }
     }
 
+    private async Task DeleteApiKey()
+    {
+        var result = await UserService.DeleteUserApiKeyAsync(ApiKey!);
+
+        if (result) 
+        {
+            ApiKey = null;
+            ToastService.ShowSuccess("API Key has been deleted successfully.", 5000);
+        }
+        else ToastService.ShowError("There was an error deleting the key.", 5000);
+    }
+
+    private async Task RemoveDistanceReadings()
+    {
+        var result = await RS.RemoveDistanceReadings(user.Id);
+
+        if (result)
+        {
+            DistanceReadings = new();
+        }
+    }
+
+    private async Task RemoveLuminosityReadings()
+    {
+        var result = await RS.RemoveLuminosityReadings(user.Id);
+
+        if (result)
+        {
+            DistanceReadings = new();
+        }
+    }
+
+    private async Task RemoveTemperatureReadings()
+    {
+        var result = await RS.RemoveTemperatureReadings(user.Id);
+
+        if (result)
+        {
+            DistanceReadings = new();
+        }
+    }
+
+    private async Task RemoveVelocityReadings()
+    {
+        var result = await RS.RemoveVelocityReadings(user.Id);
+
+        if (result)
+        {
+            DistanceReadings = new();
+        }
+    }
+
+    private async Task RemoveGraph(string id)
+    {
+        var result = await GS.DeleteGraph(id);
+
+        if (result)
+        {
+            Graphs.Remove(Graphs.Find(g => g.Id == id));
+        }
+    }
+
     async Task CopyToClipboard()
     {
-        await ClipboardService.WriteTextAsync(ApiKey);
+        await ClipboardService.WriteTextAsync(ApiKey!);
         await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
     }
 
@@ -176,5 +273,6 @@
     {
         cts.Cancel(); // Cancel Task.Delay
         cts.Dispose();
+        timer?.Dispose();
     }
 }

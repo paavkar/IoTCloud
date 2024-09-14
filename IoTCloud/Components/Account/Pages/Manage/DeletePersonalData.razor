@@ -9,6 +9,7 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
+@inject IGraphsService GS
 
 <PageTitle>Delete Personal Data</PageTitle>
 
@@ -62,6 +63,7 @@
         }
 
         var result = await UserManager.DeleteAsync(user);
+        var graphsDeleted = await GS.DeleteUserGraphs(user.Id);
         if (!result.Succeeded)
         {
             throw new InvalidOperationException("Unexpected error occurred deleting user.");

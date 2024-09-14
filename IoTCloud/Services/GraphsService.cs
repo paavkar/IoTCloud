@@ -51,5 +51,33 @@ namespace IoTCloud.Services
 
             return graphItems.ToList();
         }
+
+        public async Task<bool> DeleteUserGraphs(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE gi
+                        FROM GraphItems gi
+                        LEFT JOIN UserGraphItems ugi ON gi.Id = ugi.GraphId
+                        LEFT JOIN AspNetUsers u ON ugi.UserId = u.Id
+                        WHERE u.Id = @UserId";
+
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return affected > 0 ? true : false;
+        }
+
+        public async Task<bool> DeleteGraph(string id)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE gi
+                        FROM GraphItems gi
+                        WHERE gi.Id = @Id";
+
+            var affected = await connection.ExecuteAsync(sql, new { Id = id });
+
+            return affected > 0 ? true : false;
+        }
     }
 }
