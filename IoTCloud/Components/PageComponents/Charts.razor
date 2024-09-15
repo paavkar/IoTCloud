@@ -1,0 +1,72 @@
+﻿<FluentStack>
+    @foreach (var item in Graphs)
+    {
+        switch (item.DataType)
+        {
+            case "DistanceReading":
+                <ApexCharts.ApexChart TItem="DistanceReading"
+                                      Title=@item.Name>
+                    <ApexCharts.ApexPointSeries TItem="DistanceReading"
+                                                Items="DistanceReadings"
+                                                SeriesType=item.GraphType
+                                                XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                YValue="i => (decimal)i.Distance" />
+                </ApexCharts.ApexChart>
+                <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                break;
+            case "LuminosityReading":
+                <ApexCharts.ApexChart TItem="LuminosityReading"
+                                      Title=@item.Name>
+                    <ApexCharts.ApexPointSeries TItem="LuminosityReading"
+                                                Items="LuminosityReadings"
+                                                SeriesType=item.GraphType
+                                                XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                YValue="i => (decimal)i.Luminosity" />
+                </ApexCharts.ApexChart>
+                <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                break;
+            case "TemperatureReading":
+                <ApexCharts.ApexChart TItem="TemperatureReading"
+                                      Title=@item.Name>
+                    <ApexCharts.ApexPointSeries TItem="TemperatureReading"
+                                                Items="TemperatureReadings"
+                                                SeriesType=item.GraphType
+                                                XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                YValue="i => (decimal)i.Temperature" />
+                </ApexCharts.ApexChart>
+                <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                break;
+            case "VelocityReading":
+                <ApexCharts.ApexChart TItem="VelocityReading"
+                                      Title=@item.Name>
+                    <ApexCharts.ApexPointSeries TItem="VelocityReading"
+                                                Items="VelocityReadings"
+                                                SeriesType=item.GraphType
+                                                XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                YValue="i => (decimal)i.Velocity" />
+                </ApexCharts.ApexChart>
+                <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                break;
+        }
+    }
+</FluentStack>
+
+@code {
+    [Parameter]
+    public List<GraphItem> Graphs { get; set; } = new();
+    [Parameter]
+    public List<DistanceReading> DistanceReadings { get; set; } = new();
+    [Parameter]
+    public List<LuminosityReading> LuminosityReadings { get; set; } = new();
+    [Parameter]
+    public List<TemperatureReading> TemperatureReadings { get; set; } = new();
+    [Parameter]
+    public List<VelocityReading> VelocityReadings { get; set; } = new();
+    [Parameter]
+    public EventCallback<string> OnRemoveGraph { get; set; }
+
+    private async Task RemoveGraph(string id)
+    {
+        await OnRemoveGraph.InvokeAsync(id);
+    }
+}

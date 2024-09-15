@@ -8,5 +8,7 @@ namespace IoTCloud.Services
         Task<string?> GetUserApiKey(string userId);
         Task<ApiKey> SetUserApiKey(string userId);
         Task<bool> DeleteUserApiKeyAsync(string apiKey);
+        Task<bool> AddEmailNotification(EmailNotification emailNotification);
+        Task<EmailNotification> GetEmailNotification(string userId);
     }
 }

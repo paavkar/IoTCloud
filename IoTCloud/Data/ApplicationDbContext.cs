@@ -12,5 +12,6 @@ namespace IoTCloud.Data
         public DbSet<TemperatureReading> TemperatureReadings { get; set; }
         public DbSet<VelocityReading> VelocityReadings { get; set; }
         public DbSet<GraphItem> GraphItems { get; set; }
+        public DbSet<EmailNotification> EmailNotifications { get; set; }
     }
 }

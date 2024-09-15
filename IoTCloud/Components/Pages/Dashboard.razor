@@ -45,6 +45,10 @@
 <FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
     <FluentStack>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+        @if (DistanceReadings.Any() || LuminosityReadings.Any() || TemperatureReadings.Any() || VelocityReadings.Any())
+        {
+            <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification" >Set up email notification</FluentButton>
+        }
         @if (DistanceReadings.Any())
         {
             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveDistanceReadings">Remove Distance Readings</FluentButton>
@@ -63,58 +67,12 @@
         }
     </FluentStack>
 
-    <FluentStack>
-            @foreach (var item in Graphs)
-            {
-                switch(item.DataType)
-                {
-                    case "DistanceReading":
-                            <ApexCharts.ApexChart TItem="DistanceReading"
-                                                  Title=@item.Name>
-                                <ApexCharts.ApexPointSeries TItem="DistanceReading"
-                                                            Items="DistanceReadings"
-                                                            SeriesType=item.GraphType
-                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
-                                                            YValue="i => (decimal)i.Distance" />
-                            </ApexCharts.ApexChart>
-                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
-                        break;
-                    case "LuminosityReading":
-                            <ApexCharts.ApexChart TItem="LuminosityReading"
-                                                  Title=@item.Name>
-                                <ApexCharts.ApexPointSeries TItem="LuminosityReading"
-                                                            Items="LuminosityReadings"
-                                                            SeriesType=item.GraphType
-                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
-                                                            YValue="i => (decimal)i.Luminosity" />
-                            </ApexCharts.ApexChart>
-                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
-                        break;
-                    case "TemperatureReading":
-                            <ApexCharts.ApexChart TItem="TemperatureReading"
-                                                  Title=@item.Name>
-                                <ApexCharts.ApexPointSeries TItem="TemperatureReading"
-                                                            Items="TemperatureReadings"
-                                                            SeriesType=item.GraphType
-                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
-                                                            YValue="i => (decimal)i.Temperature" />
-                            </ApexCharts.ApexChart>
-                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
-                        break;
-                    case "VelocityReading":
-                            <ApexCharts.ApexChart TItem="VelocityReading"
-                                                  Title=@item.Name>
-                                <ApexCharts.ApexPointSeries TItem="VelocityReading"
-                                                            Items="VelocityReadings"
-                                                            SeriesType=item.GraphType
-                                                            XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
-                                                            YValue="i => (decimal)i.Velocity" />
-                            </ApexCharts.ApexChart>
-                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
-                        break;
-                }
-            }
-    </FluentStack>
+    <Charts Graphs="Graphs" 
+        DistanceReadings="DistanceReadings" 
+        LuminosityReadings="LuminosityReadings"
+        TemperatureReadings="TemperatureReadings"
+        VelocityReadings="VelocityReadings"
+        OnRemoveGraph="RemoveGraph" />
 </FluentStack>
 
 
@@ -263,6 +221,54 @@
         if (result)
         {
             Graphs.Remove(Graphs.Find(g => g.Id == id));
+        }
+    }
+
+    private async void SetupEmailNotification()
+    {
+        EmailNotification emailNotification = new() { UserId = user.Id };
+
+        var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(emailNotification, new DialogParameters()
+            {
+                Height = "600px",
+                Title = $"Set up a new email notification",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            emailNotification = (EmailNotification)result.Data;
+
+            var setupResult = await UserService.AddEmailNotification(emailNotification);
+
+            if (setupResult)
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Success,
+                        Title = "Email notification result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = "Email notification has been set up successfully!",
+                        }
+                    });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Error,
+                        Title = "Email notification result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = "There was an error setting up the email notification!",
+                        }
+                    });
+            }
         }
     }
 

@@ -121,6 +121,5 @@ namespace IoTCloud.Components.Account
             return Task.CompletedTask;
             //return emailSender.SendEmailAsync(email, "Reset your password", $"Please reset your password using the following code: {resetCode}");
         }
-
     }
 }

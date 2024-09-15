@@ -25,6 +25,8 @@ namespace IoTCloud.Services
 
         public async Task<ApiKey?> CheckApiKeyExistsAsync(string apiKey)
         {
+            Console.WriteLine(apiKey);
+            apiKey = apiKey.Replace(" ", "+");
             var existingKey = await _context.ApiKeys.FirstOrDefaultAsync(ak => ak.ApiKeyId == apiKey);
 
             return existingKey;
@@ -73,6 +75,23 @@ namespace IoTCloud.Services
             await _context.SaveChangesAsync();
 
             return userKey;
+        }
+
+        public async Task<bool> AddEmailNotification(EmailNotification emailNotification)
+        {
+            if (emailNotification == null) return false;
+
+            _context.EmailNotifications.Add(emailNotification);
+            var addedCount = await _context.SaveChangesAsync();
+
+            return addedCount > 0 ? true : false;
+        }
+
+        public async Task<EmailNotification> GetEmailNotification(string userId)
+        {
+            var emailNotification = await _context.EmailNotifications.FirstOrDefaultAsync(en => en.UserId == userId);
+
+            return emailNotification ?? (emailNotification = new EmailNotification());
         }
     }
 }

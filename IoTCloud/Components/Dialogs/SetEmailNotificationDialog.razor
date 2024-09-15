@@ -1,0 +1,81 @@
+﻿@implements IDialogContentComponent<EmailNotification>
+@inject IdentityUserAccessor UserAccessor
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentSelect TOption="ReadingType" Label="Reading type">
+            @foreach (ReadingType item in Enum.GetValues<ReadingType>())
+            {
+                <FluentOption Value="@item.ToString()">@item</FluentOption>
+            }
+        </FluentSelect>
+
+        <FluentRadioGroup Name="email" @bind-Value=EmailToUse Label="Use user account's email?">
+            <FluentRadio Value="1">Yes</FluentRadio>
+            <FluentRadio Value="2">No</FluentRadio>
+        </FluentRadioGroup>
+
+        @if (EmailToUse == 1)
+        {
+            Content.Email = user.Email;
+            <FluentTextField TextFieldType="TextFieldType.Email" @bind-Value=Content.Email Label="Email" ReadOnly="true" Style="width: 60%;" />
+        }
+        else
+        {
+            Content.Email = "";
+            <FluentTextField TextFieldType="TextFieldType.Email" @bind-Value=Content.Email Label="Email" Style="width: 60%;" />
+        }
+
+        <FluentRadioGroup @bind-Value=Content.NotificationThreshold Label="Threshold type for the notification">
+            <FluentRadio Value="Threshold.Under">Under</FluentRadio>
+            <FluentRadio Value="Threshold.Over">Over</FluentRadio>
+        </FluentRadioGroup>
+
+        <FluentNumberField @bind-Value="@Content.ThresholdValue" Label="Threshold value" HideStep="true" />
+
+        <FluentTextArea @bind-Value=Content.NotificationMessage Resize="TextAreaResize.Both" Label="Notification message for the email" Style="width: 60%;" />
+    </FluentStack>
+</FluentDialogBody>
+
+
+@code {
+    int? EmailToUse;
+    private ApplicationUser user = default!;
+    [Parameter]
+    public EmailNotification Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+}

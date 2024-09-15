@@ -1,35 +1,43 @@
 ﻿using Dapper;
 using IoTCloud.Data;
 using IoTCloud.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace IoTCloud.Services
 {
-    public class ReadingsService : IReadingsService
+    public class ReadingsService(ApplicationDbContext context, IConfiguration configuration, IUserService userService, IEmailSender emailSender) : IReadingsService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public ReadingsService(ApplicationDbContext context, IConfiguration configuration)
-        {
-            _context = context;
-            _configuration = configuration;
-        }
-
         private SqlConnection GetConnection()
         {
-            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
         }
 
         public async Task<bool> AddDistanceReading(float distance, string userId, DateTime timeOfMeasurement)
         {
             DistanceReading distanceReading = new() { Distance = distance, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
 
-            _context.DistanceReadings.Add(distanceReading);
-            var countOfSavedEntries = await _context.SaveChangesAsync();
+            context.DistanceReadings.Add(distanceReading);
+            var countOfSavedEntries = await context.SaveChangesAsync();
 
             if (countOfSavedEntries < 1) return false;
+
+            var emailNotification = await userService.GetEmailNotification(userId);
+
+            if (emailNotification.UserId == userId)
+            {
+                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && distance <= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {distance}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                }
+                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && distance >= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {distance}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                }
+            }
 
             return true;
         }
@@ -38,10 +46,26 @@ namespace IoTCloud.Services
         {
             LuminosityReading luminosityReading = new() { Luminosity = luminosity, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
 
-            _context.LuminosityReadings.Add(luminosityReading);
-            var countOfSavedEntries = await _context.SaveChangesAsync();
+            context.LuminosityReadings.Add(luminosityReading);
+            var countOfSavedEntries = await context.SaveChangesAsync();
 
             if (countOfSavedEntries < 1) return false;
+
+            var emailNotification = await userService.GetEmailNotification(userId);
+
+            if (emailNotification.UserId == userId)
+            {
+                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && luminosity <= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                }
+                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && luminosity >= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                }
+            }
 
             return true;
         }
@@ -50,10 +74,26 @@ namespace IoTCloud.Services
         {
             TemperatureReading temperatureReading = new() { Temperature = temperature, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
 
-            _context.TemperatureReadings.Add(temperatureReading);
-            var countOfSavedEntries = await _context.SaveChangesAsync();
+            context.TemperatureReadings.Add(temperatureReading);
+            var countOfSavedEntries = await context.SaveChangesAsync();
 
             if (countOfSavedEntries < 1) return false;
+
+            var emailNotification = await userService.GetEmailNotification(userId);
+
+            if (emailNotification.UserId == userId)
+            {
+                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && temperature <= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $"\n The sensor value was: {temperature}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                }
+                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && temperature >= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $"\n The sensor value was: {temperature}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                }
+            }
 
             return true;
         }
@@ -62,38 +102,54 @@ namespace IoTCloud.Services
         {
             VelocityReading velocityReading = new() { Velocity = velocity, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
 
-            _context.VelocityReadings.Add(velocityReading);
-            var countOfSavedEntries = await _context.SaveChangesAsync();
+            context.VelocityReadings.Add(velocityReading);
+            var countOfSavedEntries = await context.SaveChangesAsync();
 
             if (countOfSavedEntries < 1) return false;
+
+            var emailNotification = await userService.GetEmailNotification(userId);
+
+            if (emailNotification.UserId == userId)
+            {
+                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && velocity <= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                }
+                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && velocity >= emailNotification.ThresholdValue)
+                {
+                    emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
+                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                }
+            }
 
             return true;
         }
 
         public async Task<List<DistanceReading>> GetDistanceReadings(string userId)
         {
-            var readings = await _context.DistanceReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.DistanceReadings.Where(tr => tr.UserId == userId).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<LuminosityReading>> GetLuminosityReadings(string userId)
         {
-            var readings = await _context.LuminosityReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.LuminosityReadings.Where(tr => tr.UserId == userId).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<TemperatureReading>> GetTemperatureReadings(string userId)
         {
-            var readings = await _context.TemperatureReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.TemperatureReadings.Where(tr => tr.UserId == userId).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<VelocityReading>> GetVelocityReadings(string userId)
         {
-            var readings = await _context.VelocityReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.VelocityReadings.Where(tr => tr.UserId == userId).ToListAsync();
 
             return readings;
         }
