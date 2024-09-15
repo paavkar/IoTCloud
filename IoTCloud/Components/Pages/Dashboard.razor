@@ -287,6 +287,7 @@
         var dialog = await DialogService.ShowDialogAsync<EmailNotificationsDialog>(EmailNotifications, new DialogParameters()
             {
                 Height = "600px",
+                Width = "600px",
                 Title = $"Your email notifications",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,

@@ -13,13 +13,16 @@
 
 @* Footer *@
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync" Disabled="@Disabled">Save</FluentButton>
     <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
 </FluentDialogFooter>
 
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack>
+            <FluentLabel Color="Color.Error">@Message</FluentLabel>
+        </FluentStack>
         <FluentRadioGroup @bind-Value=Notification.ReadingType Label="Reading type of the data">
             @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
@@ -35,12 +38,11 @@
         @if (EmailToUse == 1)
         {
             Notification.Email = user.Email;
-            <FluentTextField TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" ReadOnly="true" Style="width: 60%;" />
+            <FluentTextField Id="account" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" ReadOnly="true" Style="width: 60%;" />
         }
         else
         {
-            Notification.Email = "";
-            <FluentTextField TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 60%;" />
+            <FluentTextField Id="nonAccount" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 60%;" Required="true" />
         }
 
         <FluentRadioGroup @bind-Value=Notification.NotificationThreshold Label="Threshold type for the notification">
@@ -56,7 +58,9 @@
 
 
 @code {
-    int? EmailToUse;
+    int? EmailToUse = 2;
+    bool Disabled = false;
+    string Message = string.Empty;
     private ApplicationUser user = default!;
     [Parameter]
     public EmailNotification Content { get; set; } = default!;
@@ -82,6 +86,12 @@
 
     private async Task SaveAsync()
     {
+        if (Notification.Email.Length < 5)
+        {
+            Message = "Add an email before continuing";
+            return;
+        }
+        Message = string.Empty;
         Content.Id = Notification.Id;
         Content.Email = Notification.Email;
         Content.UserId = Notification.UserId;
@@ -91,6 +101,14 @@
         Content.ThresholdValue = Notification.ThresholdValue;
         await Dialog.CloseAsync(Content);
     }
+
+    public void CheckEmail(ChangeEventArgs e)
+    {
+        Console.WriteLine(e.Value.ToString());
+        if (e.Value!.ToString()!.Length < 5) Disabled = true;
+        else Disabled = false;
+    }
+
 
     private async Task CancelAsync()
     {

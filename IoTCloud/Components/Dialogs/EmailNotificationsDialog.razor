@@ -49,23 +49,21 @@
 
     private async Task EditNotification(EmailNotification notification)
     {
+        Dialog.Hide();
         var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(notification, new DialogParameters()
             {
                 Height = "600px",
-                Title = $"Set up a new email notification",
+                Title = $"Edit an email notification",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
-                ShowDismiss = false
             });
 
+
+        Dialog.Show();
         var result = await dialog.Result;
 
-        Console.WriteLine(result.Cancelled);
-        Console.WriteLine(Content.First().ReadingType);
         if (result.Cancelled) Content = await UserService.GetEmailNotifications(notification.UserId);
         await InvokeAsync(StateHasChanged);
-
-        Console.WriteLine(Content.First().ReadingType);
 
         if (!result.Cancelled && result.Data != null)
         {
@@ -104,7 +102,7 @@
 
     private async Task DeleteNotification(string id)
     {
-        var result = UserService.RemoveEmailNotification(id);
+        var result = await UserService.RemoveEmailNotification(id);
 
         Content.Remove(Content.Find(en => en.Id == id));
     }

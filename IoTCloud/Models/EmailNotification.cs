@@ -9,11 +9,16 @@ namespace IoTCloud.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
-        public string Email { get; set; }
+        [Required]
+        public string Email { get; set; } = string.Empty;
         public string UserId { get; set; }
+        [Required]
         public string NotificationMessage { get; set; } = string.Empty;
+        [Required]
         public Threshold NotificationThreshold { get; set; }
+        [Required]
         public ReadingType ReadingType { get; set; }
+        [Required]
         public float ThresholdValue { get; set; }
     }
 }
