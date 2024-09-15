@@ -75,7 +75,7 @@ namespace IoTCloud.Services
             context.EmailNotifications.Add(emailNotification);
             var addedCount = await context.SaveChangesAsync();
 
-            return addedCount > 0 ? true : false;
+            return addedCount > 0;
         }
 
         public async Task<List<EmailNotification>> GetEmailNotifications(string userId)
@@ -97,6 +97,22 @@ namespace IoTCloud.Services
             var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
 
             return rowsAffected > 0;
+        }
+
+        public async Task<EmailNotification> EditEmailNotification(EmailNotification emailNotification)
+        {
+            var dbNotification = await context.EmailNotifications.FindAsync(emailNotification.Id);
+
+            if (dbNotification is not null)
+            {
+                dbNotification.Email = emailNotification.Email;
+                dbNotification.ThresholdValue = emailNotification.ThresholdValue;
+                dbNotification.NotificationMessage = emailNotification.NotificationMessage;
+                dbNotification.NotificationThreshold = emailNotification.NotificationThreshold;
+
+                await context.SaveChangesAsync();
+            }
+            return dbNotification;
         }
     }
 }

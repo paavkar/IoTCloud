@@ -11,5 +11,6 @@ namespace IoTCloud.Services
         Task<bool> AddEmailNotification(EmailNotification emailNotification);
         Task<List<EmailNotification>> GetEmailNotifications(string userId);
         Task<bool> RemoveEmailNotification(string id);
+        Task<EmailNotification> EditEmailNotification(EmailNotification emailNotification);
     }
 }

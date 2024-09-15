@@ -45,10 +45,12 @@
 <FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
     <FluentStack>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
-        @if (DistanceReadings.Any() || LuminosityReadings.Any() || TemperatureReadings.Any() || VelocityReadings.Any())
+        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification">Set up email notification</FluentButton>
+        @if (EmailNotifications.Any())
         {
-            <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification" >Set up email notification</FluentButton>
+            <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="OpenEmailNotificationsDialog">Open email notification</FluentButton>
         }
+
         @if (DistanceReadings.Any())
         {
             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveDistanceReadings">Remove Distance Readings</FluentButton>
@@ -88,6 +90,7 @@
     private List<LuminosityReading> LuminosityReadings { get; set; } = new();
     private List<TemperatureReading> TemperatureReadings { get; set; } = new();
     private List<VelocityReading> VelocityReadings { get; set; } = new();
+    private List<EmailNotification> EmailNotifications { get; set; } = new();
 
     private Timer? timer;
 
@@ -95,6 +98,8 @@
     {
         user = await UserAccessor.GetRequiredUserAsync();
         ApiKey = await UserService.GetUserApiKey(user.Id);
+
+        EmailNotifications = await UserService.GetEmailNotifications(user.Id);
 
         Graphs = await GS.GetUserGraphs(user.Id);
         foreach (var graph in Graphs)
@@ -143,10 +148,11 @@
     {
         var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
             {
-                Height = "300px",
+                Height = "350px",
                 Title = $"Add a new data graph",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
+                ShowDismiss = false
             });
 
         var result = await dialog.Result;
@@ -234,6 +240,7 @@
                 Title = $"Set up a new email notification",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
+                ShowDismiss = false
             });
 
         var result = await dialog.Result;
@@ -245,6 +252,9 @@
 
             if (setupResult)
             {
+                EmailNotifications = await UserService.GetEmailNotifications(user.Id);
+                await InvokeAsync(StateHasChanged);
+
                 ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
                     {
                         Intent = ToastIntent.Success,
@@ -270,6 +280,23 @@
                     });
             }
         }
+    }
+
+    private async void OpenEmailNotificationsDialog()
+    {
+        var dialog = await DialogService.ShowDialogAsync<EmailNotificationsDialog>(EmailNotifications, new DialogParameters()
+            {
+                Height = "600px",
+                Title = $"Your email notifications",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+            });
+
+        var result = await dialog.Result;
+        List<EmailNotification> notificationsList = new();
+        if (result.Data != null) notificationsList = (List<EmailNotification>)result.Data;
+
+        if (notificationsList.Count < 1) await InvokeAsync(StateHasChanged);
     }
 
     async Task CopyToClipboard()

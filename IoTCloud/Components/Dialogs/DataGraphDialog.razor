@@ -25,12 +25,13 @@
                       OptionSelected="@(i => i.Selected)"
                           @bind-Value="@Content.DataType" />
 
-        <FluentSelect TOption="ApexCharts.SeriesType" Label="Chart type">
+
+        <FluentRadioGroup @bind-Value=Content.GraphType Label="Select the chart type">
             @foreach (ApexCharts.SeriesType item in Enum.GetValues<ApexCharts.SeriesType>())
             {
-                <FluentOption Value="@item.ToString()">@item</FluentOption>
+                <FluentRadio Value="@item">@item</FluentRadio>
             }
-        </FluentSelect>
+        </FluentRadioGroup>
 
         <FluentTextField @bind-Value="@Content.Name">Graph title:</FluentTextField>
     </FluentStack>

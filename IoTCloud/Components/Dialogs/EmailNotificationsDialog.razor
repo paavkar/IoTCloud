@@ -1,0 +1,111 @@
+﻿@implements IDialogContentComponent<List<EmailNotification>>
+@inject IUserService UserService
+@inject IToastService ToastService
+@inject IDialogService DialogService
+
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Close</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentDataGrid Items="@Content.AsQueryable()">
+            <PropertyColumn Title="Notification for" Property="@(en => en.ReadingType)" />
+            <PropertyColumn Title="Over/Under" Property="@(en => en.NotificationThreshold)" />
+            <PropertyColumn title="Threshold value" Property="@(en => en.ThresholdValue)" />
+                <TemplateColumn Title="Actions">
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" OnClick="@(e => EditNotification(context))" />
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(e => DeleteNotification(context.Id))" />
+                </TemplateColumn>
+        </FluentDataGrid>
+    </FluentStack>
+</FluentDialogBody>
+
+
+@code {
+    [Parameter]
+    public List<EmailNotification> Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task EditNotification(EmailNotification notification)
+    {
+        var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(notification, new DialogParameters()
+            {
+                Height = "600px",
+                Title = $"Set up a new email notification",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+
+        Console.WriteLine(result.Cancelled);
+        Console.WriteLine(Content.First().ReadingType);
+        if (result.Cancelled) Content = await UserService.GetEmailNotifications(notification.UserId);
+        await InvokeAsync(StateHasChanged);
+
+        Console.WriteLine(Content.First().ReadingType);
+
+        if (!result.Cancelled && result.Data != null)
+        {
+            notification = (EmailNotification)result.Data;
+
+            var setupResult = await UserService.EditEmailNotification(notification);
+
+            if (setupResult is not null)
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Success,
+                        Title = "Email notification result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = "Email notification has been edited successfully!",
+                        }
+                    });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Error,
+                        Title = "Email notification result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = "There was an error editing the email notification!",
+                        }
+                    });
+            }
+        }
+    }
+
+    private async Task DeleteNotification(string id)
+    {
+        var result = UserService.RemoveEmailNotification(id);
+
+        Content.Remove(Content.Find(en => en.Id == id));
+    }
+}

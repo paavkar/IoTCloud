@@ -11,7 +11,7 @@ namespace IoTCloud.Models
         public string Id { get; set; }
         public string Email { get; set; }
         public string UserId { get; set; }
-        public string NotificationMessage { get; set; }
+        public string NotificationMessage { get; set; } = string.Empty;
         public Threshold NotificationThreshold { get; set; }
         public ReadingType ReadingType { get; set; }
         public float ThresholdValue { get; set; }
