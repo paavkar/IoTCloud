@@ -7,27 +7,18 @@ using System.Security.Cryptography;
 
 namespace IoTCloud.Services
 {
-    public class UserService : IUserService
+    public class UserService(ApplicationDbContext context, IConfiguration configuration) : IUserService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public UserService(ApplicationDbContext context, IConfiguration configuration)
-        {
-            _context = context;
-            _configuration = configuration;
-        }
-
         private SqlConnection GetConnection()
         {
-            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
         }
 
         public async Task<ApiKey?> CheckApiKeyExistsAsync(string apiKey)
         {
             Console.WriteLine(apiKey);
             apiKey = apiKey.Replace(" ", "+");
-            var existingKey = await _context.ApiKeys.FirstOrDefaultAsync(ak => ak.ApiKeyId == apiKey);
+            var existingKey = await context.ApiKeys.FirstOrDefaultAsync(ak => ak.ApiKeyId == apiKey);
 
             return existingKey;
         }
@@ -42,12 +33,12 @@ namespace IoTCloud.Services
 
             var affected = await connection.ExecuteAsync(sql, new { ApiKey = apiKey });
 
-            return affected > 0 ? true : false;
+            return affected > 0;
         }
 
         public async Task<string?> GetUserApiKey(string userId)
         {
-            var userKey = await _context.ApiKeys.FirstOrDefaultAsync(ak => ak.UserId == userId);
+            var userKey = await context.ApiKeys.FirstOrDefaultAsync(ak => ak.UserId == userId);
 
             if (userKey != null) return userKey.ApiKeyId;
 
@@ -56,7 +47,7 @@ namespace IoTCloud.Services
 
         public async Task<ApiKey> SetUserApiKey(string userId)
         {
-            var userKey = await _context.ApiKeys.FirstOrDefaultAsync(ak => ak.UserId == userId);
+            var userKey = await context.ApiKeys.FirstOrDefaultAsync(ak => ak.UserId == userId);
 
             var key = new byte[32];
             using (var generator = RandomNumberGenerator.Create())
@@ -68,11 +59,11 @@ namespace IoTCloud.Services
                 userKey = new();
                 userKey.UserId = userId;
                 userKey.ApiKeyId = apiKey;
-                _context.ApiKeys.Add(userKey);
+                context.ApiKeys.Add(userKey);
             }
             else userKey.ApiKeyId = apiKey;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return userKey;
         }
@@ -81,17 +72,31 @@ namespace IoTCloud.Services
         {
             if (emailNotification == null) return false;
 
-            _context.EmailNotifications.Add(emailNotification);
-            var addedCount = await _context.SaveChangesAsync();
+            context.EmailNotifications.Add(emailNotification);
+            var addedCount = await context.SaveChangesAsync();
 
             return addedCount > 0 ? true : false;
         }
 
-        public async Task<EmailNotification> GetEmailNotification(string userId)
+        public async Task<List<EmailNotification>> GetEmailNotifications(string userId)
         {
-            var emailNotification = await _context.EmailNotifications.FirstOrDefaultAsync(en => en.UserId == userId);
+            var emailNotifications = await context.EmailNotifications.Where(en => en.UserId == userId).ToListAsync();
 
-            return emailNotification ?? (emailNotification = new EmailNotification());
+            return emailNotifications;
+        }
+
+        public async Task<bool> RemoveEmailNotification(string id)
+        {
+            using var connection = GetConnection();
+
+            var sql = @"
+                        DELETE en
+                        FROM EmailNotifications en
+                        WHERE en.Id = @Id";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
+
+            return rowsAffected > 0;
         }
     }
 }

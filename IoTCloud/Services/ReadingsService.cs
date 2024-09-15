@@ -23,19 +23,22 @@ namespace IoTCloud.Services
 
             if (countOfSavedEntries < 1) return false;
 
-            var emailNotification = await userService.GetEmailNotification(userId);
+            var emailNotifications = await userService.GetEmailNotifications(userId);
 
-            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Distance)
+            foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && distance <= emailNotification.ThresholdValue)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Distance)
                 {
-                    emailNotification.NotificationMessage += $" The sensor value was: {distance}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
-                }
-                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && distance >= emailNotification.ThresholdValue)
-                {
-                    emailNotification.NotificationMessage += $" The sensor value was: {distance}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                    if (emailNotification.NotificationThreshold == Enums.Threshold.Under && distance <= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {distance}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                    }
+                    else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && distance >= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {distance}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                    }
                 }
             }
 
@@ -51,19 +54,22 @@ namespace IoTCloud.Services
 
             if (countOfSavedEntries < 1) return false;
 
-            var emailNotification = await userService.GetEmailNotification(userId);
+            var emailNotifications = await userService.GetEmailNotifications(userId);
 
-            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Luminosity)
+            foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && luminosity <= emailNotification.ThresholdValue)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Luminosity)
                 {
-                    emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
-                }
-                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && luminosity >= emailNotification.ThresholdValue)
-                {
-                    emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                    if (emailNotification.NotificationThreshold == Enums.Threshold.Under && luminosity <= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                    }
+                    else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && luminosity >= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                    }
                 }
             }
 
@@ -79,19 +85,22 @@ namespace IoTCloud.Services
 
             if (countOfSavedEntries < 1) return false;
 
-            var emailNotification = await userService.GetEmailNotification(userId);
+            var emailNotifications = await userService.GetEmailNotifications(userId);
 
-            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Temperature)
+            foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && temperature <= emailNotification.ThresholdValue)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Temperature)
                 {
-                    emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
-                }
-                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && temperature >= emailNotification.ThresholdValue)
-                {
-                    emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                    if (emailNotification.NotificationThreshold == Enums.Threshold.Under && temperature <= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                    }
+                    else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && temperature >= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                    }
                 }
             }
 
@@ -107,19 +116,22 @@ namespace IoTCloud.Services
 
             if (countOfSavedEntries < 1) return false;
 
-            var emailNotification = await userService.GetEmailNotification(userId);
+            var emailNotifications = await userService.GetEmailNotifications(userId);
 
-            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Velocity)
+            foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.NotificationThreshold == Enums.Threshold.Under && velocity <= emailNotification.ThresholdValue)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Velocity)
                 {
-                    emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
-                }
-                else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && velocity >= emailNotification.ThresholdValue)
-                {
-                    emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
-                    await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                    if (emailNotification.NotificationThreshold == Enums.Threshold.Under && velocity <= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                    }
+                    else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && velocity >= emailNotification.ThresholdValue)
+                    {
+                        emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                    }
                 }
             }
 
@@ -164,7 +176,7 @@ namespace IoTCloud.Services
 
             var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
-            return affected > 0 ? true : false;
+            return affected > 0;
         }
 
         public async Task<bool> RemoveLuminosityReadings(string userId)
@@ -177,7 +189,7 @@ namespace IoTCloud.Services
 
             var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
-            return affected > 0 ? true : false;
+            return affected > 0;
         }
 
         public async Task<bool> RemoveTemperatureReadings(string userId)
@@ -190,7 +202,7 @@ namespace IoTCloud.Services
 
             var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
-            return affected > 0 ? true : false;
+            return affected > 0;
         }
 
         public async Task<bool> RemoveVelocityReadings(string userId)
@@ -203,7 +215,7 @@ namespace IoTCloud.Services
 
             var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
-            return affected > 0 ? true : false;
+            return affected > 0;
         }
     }
 }

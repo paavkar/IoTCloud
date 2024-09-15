@@ -5,26 +5,17 @@ using Microsoft.Data.SqlClient;
 
 namespace IoTCloud.Services
 {
-    public class GraphsService : IGraphsService
+    public class GraphsService(ApplicationDbContext context, IConfiguration configuration) : IGraphsService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public GraphsService(ApplicationDbContext context, IConfiguration configuration)
-        {
-            _context = context;
-            _configuration = configuration;
-        }
-
         private SqlConnection GetConnection()
         {
-            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
         }
 
         public async Task<bool> AddUserGraph(GraphItem item, string userId)
         {
-            await _context.GraphItems.AddAsync(item);
-            await _context.SaveChangesAsync();
+            await context.GraphItems.AddAsync(item);
+            await context.SaveChangesAsync();
 
             using var connection = GetConnection();
 
@@ -62,9 +53,9 @@ namespace IoTCloud.Services
                         LEFT JOIN AspNetUsers u ON ugi.UserId = u.Id
                         WHERE u.Id = @UserId";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
-            return affected > 0 ? true : false;
+            return rowsAffected > 0;
         }
 
         public async Task<bool> DeleteGraph(string id)
@@ -75,9 +66,9 @@ namespace IoTCloud.Services
                         FROM GraphItems gi
                         WHERE gi.Id = @Id";
 
-            var affected = await connection.ExecuteAsync(sql, new { Id = id });
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
 
-            return affected > 0 ? true : false;
+            return rowsAffected > 0;
         }
     }
 }
