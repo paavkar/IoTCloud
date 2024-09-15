@@ -25,7 +25,7 @@ namespace IoTCloud.Services
 
             var emailNotification = await userService.GetEmailNotification(userId);
 
-            if (emailNotification.UserId == userId)
+            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Distance)
             {
                 if (emailNotification.NotificationThreshold == Enums.Threshold.Under && distance <= emailNotification.ThresholdValue)
                 {
@@ -53,7 +53,7 @@ namespace IoTCloud.Services
 
             var emailNotification = await userService.GetEmailNotification(userId);
 
-            if (emailNotification.UserId == userId)
+            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Luminosity)
             {
                 if (emailNotification.NotificationThreshold == Enums.Threshold.Under && luminosity <= emailNotification.ThresholdValue)
                 {
@@ -81,16 +81,16 @@ namespace IoTCloud.Services
 
             var emailNotification = await userService.GetEmailNotification(userId);
 
-            if (emailNotification.UserId == userId)
+            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Temperature)
             {
                 if (emailNotification.NotificationThreshold == Enums.Threshold.Under && temperature <= emailNotification.ThresholdValue)
                 {
-                    emailNotification.NotificationMessage += $"\n The sensor value was: {temperature}";
+                    emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
                     await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
                 }
                 else if (emailNotification.NotificationThreshold == Enums.Threshold.Over && temperature >= emailNotification.ThresholdValue)
                 {
-                    emailNotification.NotificationMessage += $"\n The sensor value was: {temperature}";
+                    emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
                     await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
                 }
             }
@@ -109,7 +109,7 @@ namespace IoTCloud.Services
 
             var emailNotification = await userService.GetEmailNotification(userId);
 
-            if (emailNotification.UserId == userId)
+            if (emailNotification.UserId == userId && emailNotification.ReadingType == Enums.ReadingType.Velocity)
             {
                 if (emailNotification.NotificationThreshold == Enums.Threshold.Under && velocity <= emailNotification.ThresholdValue)
                 {
