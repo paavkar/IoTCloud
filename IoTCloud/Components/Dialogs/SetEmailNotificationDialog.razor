@@ -26,7 +26,10 @@
         <FluentRadioGroup @bind-Value=Notification.ReadingType Label="Reading type of the data">
             @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
-                <FluentRadio Value="@item">@item</FluentRadio>
+                if (item != ReadingType.Binary)
+                {
+                    <FluentRadio Value="@item">@item</FluentRadio>
+                }
             }
         </FluentRadioGroup>
 
@@ -45,12 +48,24 @@
             <FluentTextField Id="nonAccount" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 60%;" Required="true" />
         }
 
-        <FluentRadioGroup @bind-Value=Notification.NotificationThreshold Label="Threshold type for the notification">
-            <FluentRadio Value="Threshold.Under">Under</FluentRadio>
-            <FluentRadio Value="Threshold.Over">Over</FluentRadio>
+        <FluentRadioGroup Name="email" @bind-Value=Notification.IsBinary Label="Is the notification for a binary value?">
+            <FluentRadio Value="true">Yes</FluentRadio>
+            <FluentRadio Value="false">No</FluentRadio>
         </FluentRadioGroup>
 
-        <FluentNumberField @bind-Value="@Notification.ThresholdValue" Label="Threshold value" HideStep="true" />
+        @if (!Notification.IsBinary)
+        {
+            <FluentRadioGroup @bind-Value=Notification.NotificationThreshold Label="Threshold type for the notification">
+                <FluentRadio Value="Threshold.Under">Under</FluentRadio>
+                <FluentRadio Value="Threshold.Over">Over</FluentRadio>
+            </FluentRadioGroup>
+
+            <FluentNumberField @bind-Value="@Notification.ThresholdValue" Label="Threshold value" HideStep="true" />
+        }
+        else
+        {
+            <FluentLabel Weight="FontWeight.Bold">Email will be sent if the value is 1.</FluentLabel>
+        }
 
         <FluentTextArea @bind-Value=Notification.NotificationMessage Resize="TextAreaResize.Both" Label="Notification message for the email" Style="width: 60%;" />
     </FluentStack>
@@ -74,14 +89,12 @@
         user = await UserAccessor.GetRequiredUserAsync();
         if (Content.Email == user.Email) EmailToUse = 1;
 
-        Notification.Id = Content.Id;
         Notification.Email = Content.Email;
-        Notification.UserId = Content.UserId;
         Notification.NotificationMessage = Content.NotificationMessage;
         Notification.NotificationThreshold = Content.NotificationThreshold;
         Notification.ReadingType = Content.ReadingType;
         Notification.ThresholdValue = Content.ThresholdValue;
-
+        Notification.IsBinary = Content.IsBinary;
     }
 
     private async Task SaveAsync()
@@ -92,13 +105,13 @@
             return;
         }
         Message = string.Empty;
-        Content.Id = Notification.Id;
         Content.Email = Notification.Email;
-        Content.UserId = Notification.UserId;
         Content.NotificationMessage = Notification.NotificationMessage;
         Content.NotificationThreshold = Notification.NotificationThreshold;
         Content.ReadingType = Notification.ReadingType;
         Content.ThresholdValue = Notification.ThresholdValue;
+        Content.IsBinary = Notification.IsBinary;
+
         await Dialog.CloseAsync(Content);
     }
 

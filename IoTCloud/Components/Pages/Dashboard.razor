@@ -67,6 +67,10 @@
         {
             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveVelocityReadings">Remove Velocity Readings</FluentButton>
         }
+        @if (HumidityReadings.Any())
+        {
+            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveHumidityReadings">Remove Humidity Readings</FluentButton>
+        }
     </FluentStack>
 
     <Charts Graphs="Graphs" 
@@ -74,6 +78,7 @@
         LuminosityReadings="LuminosityReadings"
         TemperatureReadings="TemperatureReadings"
         VelocityReadings="VelocityReadings"
+        HumidityReadings="HumidityReadings"
         OnRemoveGraph="RemoveGraph" />
 </FluentStack>
 
@@ -90,6 +95,8 @@
     private List<LuminosityReading> LuminosityReadings { get; set; } = new();
     private List<TemperatureReading> TemperatureReadings { get; set; } = new();
     private List<VelocityReading> VelocityReadings { get; set; } = new();
+    private List<BinaryReading> BinaryReadings { get; set; } = new();
+    private List<HumidityReading> HumidityReadings { get; set; } = new();
     private List<EmailNotification> EmailNotifications { get; set; } = new();
 
     private Timer? timer;
@@ -133,6 +140,9 @@
             case "VelocityReading":
                 VelocityReadings = await RS.GetVelocityReadings(user.Id);
                 break;
+            case "HumidityReading":
+                HumidityReadings = await RS.GetHumidityReadings(user.Id);
+                break;
         }
     }
 
@@ -160,7 +170,9 @@
         {
             GraphItem item = (GraphItem)result.Data;
 
-            await GS.AddUserGraph(item, user.Id);
+            item.UserId = user.Id;
+
+            await GS.AddUserGraph(item);
 
             await GetReadings(item);
             Graphs.Add(item);
@@ -196,7 +208,7 @@
 
         if (result)
         {
-            DistanceReadings = new();
+            LuminosityReadings = new();
         }
     }
 
@@ -206,7 +218,7 @@
 
         if (result)
         {
-            DistanceReadings = new();
+            TemperatureReadings = new();
         }
     }
 
@@ -216,7 +228,17 @@
 
         if (result)
         {
-            DistanceReadings = new();
+            VelocityReadings = new();
+        }
+    }
+
+    private async Task RemoveHumidityReadings()
+    {
+        var result = await RS.RemoveHumidityReadings(user.Id);
+
+        if (result)
+        {
+            HumidityReadings = new();
         }
     }
 
@@ -236,7 +258,7 @@
 
         var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(emailNotification, new DialogParameters()
             {
-                Height = "600px",
+                Height = "700px",
                 Title = $"Set up a new email notification",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,

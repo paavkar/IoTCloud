@@ -12,20 +12,12 @@ namespace IoTCloud.Services
             return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
         }
 
-        public async Task<bool> AddUserGraph(GraphItem item, string userId)
+        public async Task<bool> AddUserGraph(GraphItem item)
         {
             await context.GraphItems.AddAsync(item);
-            await context.SaveChangesAsync();
+            var addedCount = await context.SaveChangesAsync();
 
-            using var connection = GetConnection();
-
-            string insertSql = @"
-                                INSERT INTO UserGraphItems (GraphId, UserId)
-                                VALUES (@GraphId, @UserId)";
-
-            await connection.ExecuteAsync(insertSql, new { GraphId = item.Id, UserId = userId });
-
-            return true;
+            return addedCount > 0;
         }
 
         public async Task<List<GraphItem>> GetUserGraphs(string userId)
@@ -33,8 +25,7 @@ namespace IoTCloud.Services
             var sql = @"
                         SELECT gi.*
                         FROM GraphItems gi
-                        LEFT JOIN UserGraphItems ugi ON gi.Id = ugi.GraphId
-                        LEFT JOIN AspNetUsers u ON ugi.UserId = u.Id
+                        LEFT JOIN AspNetUsers u ON gi.UserId = u.Id
                         WHERE u.Id = @UserId";
 
             using var connection = GetConnection();
@@ -49,8 +40,7 @@ namespace IoTCloud.Services
             var sql = @"
                         DELETE gi
                         FROM GraphItems gi
-                        LEFT JOIN UserGraphItems ugi ON gi.Id = ugi.GraphId
-                        LEFT JOIN AspNetUsers u ON ugi.UserId = u.Id
+                        LEFT JOIN AspNetUsers u ON gi.UserId = u.Id
                         WHERE u.Id = @UserId";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId });

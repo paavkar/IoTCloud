@@ -11,5 +11,6 @@ namespace IoTCloud.Models
         public float Distance { get; set; }
         public string UserId { get; set; }
         public DateTime TimeOfMeasurement { get; set; }
+        public string SensorName { get; set; }
     }
 }

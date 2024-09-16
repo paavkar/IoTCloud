@@ -47,6 +47,17 @@
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
                 break;
+            case "HumidityReading":
+                <ApexCharts.ApexChart TItem="HumidityReading"
+                                      Title=@item.Name>
+                    <ApexCharts.ApexPointSeries TItem="HumidityReading"
+                                                Items="HumidityReadings"
+                                                SeriesType=item.GraphType
+                                                XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                YValue="i => (decimal)i.Humidity" />
+                </ApexCharts.ApexChart>
+                <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                break;
         }
     }
 </FluentStack>
@@ -62,6 +73,8 @@
     public List<TemperatureReading> TemperatureReadings { get; set; } = new();
     [Parameter]
     public List<VelocityReading> VelocityReadings { get; set; } = new();
+    [Parameter]
+    public List<HumidityReading> HumidityReadings { get; set; } = new();
     [Parameter]
     public EventCallback<string> OnRemoveGraph { get; set; }
 

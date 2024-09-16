@@ -13,7 +13,9 @@
             Distance,
             Luminosity,
             Temperature,
-            Velocity
+            Velocity,
+            Humidity,
+            Binary
         }
     }
 }

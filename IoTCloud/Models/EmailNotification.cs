@@ -19,6 +19,8 @@ namespace IoTCloud.Models
         [Required]
         public ReadingType ReadingType { get; set; }
         [Required]
-        public float ThresholdValue { get; set; }
+        public float ThresholdValue { get; set; } = 0;
+        public bool IsBinary { get; set; } = false;
+        public string SensorName { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using IoTCloud.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IoTCloud.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915193816_BinaryHumidityReadings")]
+    partial class BinaryHumidityReadings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,10 +121,6 @@ namespace IoTCloud.Migrations
                     b.Property<int>("ReadingType")
                         .HasColumnType("int");
 
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("TimeOfMeasurement")
                         .HasColumnType("datetime2");
 
@@ -142,10 +141,6 @@ namespace IoTCloud.Migrations
 
                     b.Property<float>("Distance")
                         .HasColumnType("real");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimeOfMeasurement")
                         .HasColumnType("datetime2");
@@ -169,9 +164,6 @@ namespace IoTCloud.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsBinary")
-                        .HasColumnType("bit");
-
                     b.Property<string>("NotificationMessage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -181,10 +173,6 @@ namespace IoTCloud.Migrations
 
                     b.Property<int>("ReadingType")
                         .HasColumnType("int");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("ThresholdValue")
                         .HasColumnType("real");
@@ -212,14 +200,6 @@ namespace IoTCloud.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("GraphItems");
@@ -233,10 +213,6 @@ namespace IoTCloud.Migrations
 
                     b.Property<float>("Humidity")
                         .HasColumnType("real");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimeOfMeasurement")
                         .HasColumnType("datetime2");
@@ -259,10 +235,6 @@ namespace IoTCloud.Migrations
                     b.Property<float>("Luminosity")
                         .HasColumnType("real");
 
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("TimeOfMeasurement")
                         .HasColumnType("datetime2");
 
@@ -275,42 +247,11 @@ namespace IoTCloud.Migrations
                     b.ToTable("LuminosityReadings");
                 });
 
-            modelBuilder.Entity("IoTCloud.Models.TableItem", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsBinary")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReadingType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TableItems");
-                });
-
             modelBuilder.Entity("IoTCloud.Models.TemperatureReading", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Temperature")
                         .HasColumnType("real");
@@ -332,10 +273,6 @@ namespace IoTCloud.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SensorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimeOfMeasurement")
                         .HasColumnType("datetime2");
