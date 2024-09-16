@@ -7,7 +7,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-IoT-Cloud-0fd22b83-ff4e-4943-9024-c8f2f61cd768</UserSecretsId>
     <RootNamespace>IoTCloud</RootNamespace>
-    <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
