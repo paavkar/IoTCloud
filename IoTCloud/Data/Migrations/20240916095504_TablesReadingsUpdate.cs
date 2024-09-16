@@ -45,15 +45,15 @@ namespace IoTCloud.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_UserGraphItems_GraphItems_Id",
-                table: "UserGraphItems");
-            migrationBuilder.DropForeignKey(
-                name: "FK_UserGraphItems_AspNetUsers_Id",
-                table: "UserGraphItems");
+            //migrationBuilder.DropForeignKey(
+            //    name: "FK_UserGraphItems_GraphItems_Id",
+            //    table: "UserGraphItems");
+            //migrationBuilder.DropForeignKey(
+            //    name: "FK_UserGraphItems_AspNetUsers_Id",
+            //    table: "UserGraphItems");
 
-            migrationBuilder.DropTable(
-                name: "UserGraphItems");
+            //migrationBuilder.DropTable(
+            //    name: "UserGraphItems");
 
             migrationBuilder.AddColumn<string>(
                 name: "UserId",
