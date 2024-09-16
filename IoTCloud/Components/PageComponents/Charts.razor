@@ -7,7 +7,7 @@
                 <ApexCharts.ApexChart TItem="DistanceReading"
                                       Title=@item.Name>
                     <ApexCharts.ApexPointSeries TItem="DistanceReading"
-                                                Items="DistanceReadings"
+                                                Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
                                                 XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                 YValue="i => (decimal)i.Distance" />
@@ -18,7 +18,7 @@
                 <ApexCharts.ApexChart TItem="LuminosityReading"
                                       Title=@item.Name>
                     <ApexCharts.ApexPointSeries TItem="LuminosityReading"
-                                                Items="LuminosityReadings"
+                                                Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
                                                 XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                 YValue="i => (decimal)i.Luminosity" />
@@ -29,7 +29,7 @@
                 <ApexCharts.ApexChart TItem="TemperatureReading"
                                       Title=@item.Name>
                     <ApexCharts.ApexPointSeries TItem="TemperatureReading"
-                                                Items="TemperatureReadings"
+                                                Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
                                                 XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                 YValue="i => (decimal)i.Temperature" />
@@ -40,7 +40,7 @@
                 <ApexCharts.ApexChart TItem="VelocityReading"
                                       Title=@item.Name>
                     <ApexCharts.ApexPointSeries TItem="VelocityReading"
-                                                Items="VelocityReadings"
+                                                Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
                                                 XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                 YValue="i => (decimal)i.Velocity" />
@@ -51,7 +51,7 @@
                 <ApexCharts.ApexChart TItem="HumidityReading"
                                       Title=@item.Name>
                     <ApexCharts.ApexPointSeries TItem="HumidityReading"
-                                                Items="HumidityReadings"
+                                                Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
                                                 XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
                                                 YValue="i => (decimal)i.Humidity" />

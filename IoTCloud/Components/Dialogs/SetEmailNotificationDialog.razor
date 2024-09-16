@@ -2,7 +2,7 @@
 @inject IdentityUserAccessor UserAccessor
 
 @* Header *@
-<FluentDialogHeader ShowDismiss="true">
+<FluentDialogHeader>
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
         <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
         <FluentLabel Typo="Typography.PaneHeader">
@@ -19,55 +19,59 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentStack Orientation="Orientation.Vertical">
-        <FluentStack>
+    <FluentStack>
             <FluentLabel Color="Color.Error">@Message</FluentLabel>
-        </FluentStack>
-        <FluentRadioGroup @bind-Value=Notification.ReadingType Label="Reading type of the data">
-            @foreach (ReadingType item in Enum.GetValues<ReadingType>())
-            {
-                if (item != ReadingType.Binary)
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentRadioGroup @bind-Value=Notification.ReadingType Label="Reading type of the data">
+                @foreach (ReadingType item in Enum.GetValues<ReadingType>())
                 {
-                    <FluentRadio Value="@item">@item</FluentRadio>
+                    if (item != ReadingType.Binary)
+                    {
+                        <FluentRadio Value="@item">@item</FluentRadio>
+                    }
                 }
-            }
-        </FluentRadioGroup>
-
-        <FluentRadioGroup Name="email" @bind-Value=EmailToUse Label="Use user account's email?">
-            <FluentRadio Value="1">Yes</FluentRadio>
-            <FluentRadio Value="2">No</FluentRadio>
-        </FluentRadioGroup>
-
-        @if (EmailToUse == 1)
-        {
-            Notification.Email = user.Email;
-            <FluentTextField Id="account" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" ReadOnly="true" Style="width: 60%;" />
-        }
-        else
-        {
-            <FluentTextField Id="nonAccount" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 60%;" Required="true" />
-        }
-
-        <FluentRadioGroup Name="email" @bind-Value=Notification.IsBinary Label="Is the notification for a binary value?">
-            <FluentRadio Value="true">Yes</FluentRadio>
-            <FluentRadio Value="false">No</FluentRadio>
-        </FluentRadioGroup>
-
-        @if (!Notification.IsBinary)
-        {
-            <FluentRadioGroup @bind-Value=Notification.NotificationThreshold Label="Threshold type for the notification">
-                <FluentRadio Value="Threshold.Under">Under</FluentRadio>
-                <FluentRadio Value="Threshold.Over">Over</FluentRadio>
             </FluentRadioGroup>
 
-            <FluentNumberField @bind-Value="@Notification.ThresholdValue" Label="Threshold value" HideStep="true" />
-        }
-        else
-        {
-            <FluentLabel Weight="FontWeight.Bold">Email will be sent if the value is 1.</FluentLabel>
-        }
+            <FluentRadioGroup Name="email" @bind-Value=EmailToUse Label="Use user account's email?">
+                <FluentRadio Value="1">Yes</FluentRadio>
+                <FluentRadio Value="2">No</FluentRadio>
+            </FluentRadioGroup>
 
-        <FluentTextArea @bind-Value=Notification.NotificationMessage Resize="TextAreaResize.Both" Label="Notification message for the email" Style="width: 60%;" />
+            @if (EmailToUse == 1)
+            {
+                Notification.Email = user.Email;
+                <FluentTextField Id="account" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" ReadOnly="true" Style="width: 90%;" />
+            }
+            else
+            {
+                <FluentTextField Id="nonAccount" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 90%;" Required="true" />
+            }
+
+            <FluentTextField @bind-Value="@Notification.SensorName" Style="width: 90%;">What sensor should this notification be for?</FluentTextField>
+        </FluentStack>
+
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentRadioGroup Name="email" @bind-Value=Notification.IsBinary Label="Is the notification for a binary value?">
+                <FluentRadio Value="true">Yes</FluentRadio>
+                <FluentRadio Value="false">No</FluentRadio>
+            </FluentRadioGroup>
+
+            @if (!Notification.IsBinary)
+            {
+                <FluentRadioGroup @bind-Value=Notification.NotificationThreshold Label="Threshold type for the notification">
+                    <FluentRadio Value="Threshold.Under">Under</FluentRadio>
+                    <FluentRadio Value="Threshold.Over">Over</FluentRadio>
+                </FluentRadioGroup>
+
+                <FluentNumberField @bind-Value="@Notification.ThresholdValue" Label="Threshold value" HideStep="true" />
+            }
+            else
+            {
+                <FluentLabel Weight="FontWeight.Bold">Email will be sent if the value is 1.</FluentLabel>
+            }
+
+            <FluentTextArea @bind-Value=Notification.NotificationMessage Resize="TextAreaResize.Both" Label="Notification message for the email" Style="width: 60%;" />
+        </FluentStack>
     </FluentStack>
 </FluentDialogBody>
 
@@ -95,6 +99,7 @@
         Notification.ReadingType = Content.ReadingType;
         Notification.ThresholdValue = Content.ThresholdValue;
         Notification.IsBinary = Content.IsBinary;
+        Notification.SensorName = Content.SensorName;
     }
 
     private async Task SaveAsync()
@@ -111,6 +116,7 @@
         Content.ReadingType = Notification.ReadingType;
         Content.ThresholdValue = Notification.ThresholdValue;
         Content.IsBinary = Notification.IsBinary;
+        Content.SensorName = Notification.SensorName;
 
         await Dialog.CloseAsync(Content);
     }

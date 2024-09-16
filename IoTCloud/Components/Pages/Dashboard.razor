@@ -45,10 +45,11 @@
 <FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
     <FluentStack>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddTable">Add data table</FluentButton>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification">Set up email notification</FluentButton>
         @if (EmailNotifications.Any())
         {
-            <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="OpenEmailNotificationsDialog">Open email notification</FluentButton>
+            <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="OpenEmailNotificationsDialog">Open email notifications</FluentButton>
         }
 
         @if (DistanceReadings.Any())
@@ -73,13 +74,126 @@
         }
     </FluentStack>
 
-    <Charts Graphs="Graphs" 
+  @*   <Charts Graphs="Graphs" 
         DistanceReadings="DistanceReadings" 
         LuminosityReadings="LuminosityReadings"
         TemperatureReadings="TemperatureReadings"
         VelocityReadings="VelocityReadings"
         HumidityReadings="HumidityReadings"
-        OnRemoveGraph="RemoveGraph" />
+        OnRemoveGraph="RemoveGraph" /> *@
+
+    <FluentStack>
+        @foreach (var item in Graphs)
+        {
+            switch (item.DataType)
+            {
+                case "DistanceReading":
+                    <ApexCharts.ApexChart TItem="DistanceReading"
+                                          Title=@item.Name>
+                        <ApexCharts.ApexPointSeries TItem="DistanceReading"
+                                                    Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName)"
+                                                    SeriesType=item.GraphType
+                                                    XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                    YValue="i => (decimal)i.Distance" />
+                    </ApexCharts.ApexChart>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                    break;
+                case "LuminosityReading":
+                    <ApexCharts.ApexChart TItem="LuminosityReading"
+                                          Title=@item.Name>
+                        <ApexCharts.ApexPointSeries TItem="LuminosityReading"
+                                                    Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName)"
+                                                    SeriesType=item.GraphType
+                                                    XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                    YValue="i => (decimal)i.Luminosity" />
+                    </ApexCharts.ApexChart>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                    break;
+                case "TemperatureReading":
+                    <ApexCharts.ApexChart TItem="TemperatureReading"
+                                          Title=@item.Name>
+                        <ApexCharts.ApexPointSeries TItem="TemperatureReading"
+                                                    Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName)"
+                                                    SeriesType=item.GraphType
+                                                    XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                    YValue="i => (decimal)i.Temperature" />
+                    </ApexCharts.ApexChart>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                    break;
+                case "VelocityReading":
+                    <ApexCharts.ApexChart TItem="VelocityReading"
+                                          Title=@item.Name>
+                        <ApexCharts.ApexPointSeries TItem="VelocityReading"
+                                                    Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName)"
+                                                    SeriesType=item.GraphType
+                                                    XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                    YValue="i => (decimal)i.Velocity" />
+                    </ApexCharts.ApexChart>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                    break;
+                case "HumidityReading":
+                    <ApexCharts.ApexChart TItem="HumidityReading"
+                                          Title=@item.Name>
+                        <ApexCharts.ApexPointSeries TItem="HumidityReading"
+                                                    Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName)"
+                                                    SeriesType=item.GraphType
+                                                    XValue="i => i.TimeOfMeasurement.ToShortDateString()  + i.TimeOfMeasurement.ToLongTimeString()"
+                                                    YValue="i => (decimal)i.Humidity" />
+                    </ApexCharts.ApexChart>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
+                    break;
+            }
+        }
+    </FluentStack>
+
+    <FluentStack>
+        @foreach (var table in Tables)
+        {
+            switch (table.ReadingType)
+            {
+                case ReadingType.Distance:
+                    <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).AsQueryable()">
+                        <PropertyColumn Title="Distance" Property="@(t => t.Distance)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement)" Sortable="true" />
+                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                    </FluentDataGrid>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                    break;
+                case ReadingType.Luminosity:
+                    <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).AsQueryable()">
+                        <PropertyColumn Title="Luminosity" Property="@(t => t.Luminosity)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement)" Sortable="true" />
+                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                    </FluentDataGrid>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                    break;
+                case ReadingType.Temperature:
+                    <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).AsQueryable()">
+                        <PropertyColumn Title="Temperature" Property="@(t => t.Temperature)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement)" Sortable="true" />
+                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                    </FluentDataGrid>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                    break;
+                case ReadingType.Velocity:
+                    <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).AsQueryable()">
+                        <PropertyColumn Title="Velocity" Property="@(t => t.Velocity)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement)" Sortable="true" />
+                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                    </FluentDataGrid>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                    break;
+                case ReadingType.Humidity:
+                    <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).AsQueryable()">
+                        <PropertyColumn Title="Humidity" Property="@(t => t.Humidity)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement)" Sortable="true" />
+                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                    </FluentDataGrid>
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                    break;
+            }
+        }
+    </FluentStack>
 </FluentStack>
 
 
@@ -91,6 +205,7 @@
     CancellationTokenSource cts = new();
 
     private List<GraphItem> Graphs { get; set; } = new();
+    private List<TableItem> Tables { get; set; } = new();
     private List<DistanceReading> DistanceReadings { get; set; } = new();
     private List<LuminosityReading> LuminosityReadings { get; set; } = new();
     private List<TemperatureReading> TemperatureReadings { get; set; } = new();
@@ -109,18 +224,41 @@
         EmailNotifications = await UserService.GetEmailNotifications(user.Id);
 
         Graphs = await GS.GetUserGraphs(user.Id);
-        foreach (var graph in Graphs)
-        {
-            await GetReadings(graph);
-        }
-
-        timer = new (async _ =>
+        Tables = await GS.GetUserTables(user.Id);
+        if (Graphs.Count > 0)
         {
             foreach (var graph in Graphs)
             {
                 await GetReadings(graph);
             }
-            await InvokeAsync(StateHasChanged);
+        }
+        else if (Tables.Count > 0)
+        {
+            foreach (var table in Tables)
+            {
+                await GetReadings(table);
+            }
+        }
+
+        timer = new (async _ =>
+        {
+            if (Graphs.Count > 0)
+            {
+                foreach (var graph in Graphs)
+                {
+                    await GetReadings(graph);
+                }
+                await InvokeAsync(StateHasChanged); 
+            }
+            else if (Tables.Count > 0)
+            {
+                foreach (var table in Tables)
+                {
+                    await GetReadings(table);
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+
         }, null, 0, 15000);
     }
 
@@ -146,6 +284,28 @@
         }
     }
 
+    private async Task GetReadings(TableItem tableItem)
+    {
+        switch (tableItem.ReadingType)
+        {
+            case ReadingType.Distance:
+                DistanceReadings = await RS.GetDistanceReadings(user.Id);
+                break;
+            case ReadingType.Luminosity:
+                LuminosityReadings = await RS.GetLuminosityReadings(user.Id);
+                break;
+            case ReadingType.Temperature:
+                TemperatureReadings = await RS.GetTemperatureReadings(user.Id);
+                break;
+            case ReadingType.Velocity:
+                VelocityReadings = await RS.GetVelocityReadings(user.Id);
+                break;
+            case ReadingType.Humidity:
+                HumidityReadings = await RS.GetHumidityReadings(user.Id);
+                break;
+        }
+    }
+
     public async void CreateApiKey()
     {
         var key = await UserService.SetUserApiKey(user.Id);
@@ -158,7 +318,7 @@
     {
         var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
             {
-                Height = "350px",
+                Height = "400px",
                 Title = $"Add a new data graph",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
@@ -180,6 +340,32 @@
         }
     }
 
+    public async void AddTable()
+    {
+        var dialog = await DialogService.ShowDialogAsync<TableDialog>(new TableItem(), new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Add a new data table",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            TableItem item = (TableItem)result.Data;
+
+            item.UserId = user.Id;
+
+            await GS.AddUserTable(item);
+
+            await GetReadings(item);
+            Tables.Add(item);
+            StateHasChanged();
+        }
+    }
+
     private async Task DeleteApiKey()
     {
         var result = await UserService.DeleteUserApiKeyAsync(ApiKey!);
@@ -194,51 +380,131 @@
 
     private async Task RemoveDistanceReadings()
     {
-        var result = await RS.RemoveDistanceReadings(user.Id);
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
 
-        if (result)
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
         {
-            DistanceReadings = new();
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveDistanceReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                DistanceReadings = DistanceReadings.Where(dr => dr.SensorName != item).ToList();
+            }
+            StateHasChanged();
         }
     }
 
     private async Task RemoveLuminosityReadings()
     {
-        var result = await RS.RemoveLuminosityReadings(user.Id);
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
 
-        if (result)
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
         {
-            LuminosityReadings = new();
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveLuminosityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                LuminosityReadings = LuminosityReadings.Where(lr => lr.SensorName != item).ToList();
+            }
+            StateHasChanged();
         }
     }
 
     private async Task RemoveTemperatureReadings()
     {
-        var result = await RS.RemoveTemperatureReadings(user.Id);
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
 
-        if (result)
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
         {
-            TemperatureReadings = new();
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveTemperatureReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                TemperatureReadings = TemperatureReadings.Where(tr => tr.SensorName != item).ToList();
+            }
+            StateHasChanged();
         }
     }
 
     private async Task RemoveVelocityReadings()
     {
-        var result = await RS.RemoveVelocityReadings(user.Id);
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
 
-        if (result)
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
         {
-            VelocityReadings = new();
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveVelocityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                VelocityReadings = VelocityReadings.Where(vr => vr.SensorName != item).ToList();
+            }
+            StateHasChanged();
         }
     }
 
     private async Task RemoveHumidityReadings()
     {
-        var result = await RS.RemoveHumidityReadings(user.Id);
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
 
-        if (result)
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
         {
-            HumidityReadings = new();
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveHumidityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                HumidityReadings = HumidityReadings.Where(hr => hr.SensorName != item).ToList();
+            }
+            StateHasChanged();
         }
     }
 
@@ -252,13 +518,24 @@
         }
     }
 
+    private async Task RemoveTable(string id)
+    {
+        var result = await GS.DeleteTable(id);
+
+        if (result)
+        {
+            Tables.Remove(Tables.Find(g => g.Id == id));
+        }
+    }
+
     private async void SetupEmailNotification()
     {
         EmailNotification emailNotification = new() { UserId = user.Id };
 
         var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(emailNotification, new DialogParameters()
             {
-                Height = "700px",
+                Height = "500px",
+                Width = "700px",
                 Title = $"Set up a new email notification",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
@@ -309,10 +586,11 @@
         var dialog = await DialogService.ShowDialogAsync<EmailNotificationsDialog>(EmailNotifications, new DialogParameters()
             {
                 Height = "600px",
-                Width = "600px",
+                Width = "800px",
                 Title = $"Your email notifications",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
+                ShowDismiss = false
             });
 
         var result = await dialog.Result;

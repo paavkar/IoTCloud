@@ -17,7 +17,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddDistanceReading(float distance, string sensorName, string userId, DateTime timeOfMeasurement)
         {
-            DistanceReading distanceReading = new() { Distance = distance, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
+            DistanceReading distanceReading = new() { Distance = distance, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
             context.DistanceReadings.Add(distanceReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -28,7 +28,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Distance && !emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Distance && !emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (emailNotification.NotificationThreshold == Threshold.Under && distance <= emailNotification.ThresholdValue)
                     {
@@ -48,7 +48,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddLuminosityReading(float luminosity, string sensorName, string userId, DateTime timeOfMeasurement)
         {
-            LuminosityReading luminosityReading = new() { Luminosity = luminosity, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
+            LuminosityReading luminosityReading = new() { Luminosity = luminosity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
             context.LuminosityReadings.Add(luminosityReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -59,7 +59,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Luminosity && !emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Luminosity && !emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (emailNotification.NotificationThreshold == Threshold.Under && luminosity <= emailNotification.ThresholdValue)
                     {
@@ -79,7 +79,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddTemperatureReading(float temperature, string sensorName, string userId, DateTime timeOfMeasurement)
         {
-            TemperatureReading temperatureReading = new() { Temperature = temperature, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
+            TemperatureReading temperatureReading = new() { Temperature = temperature, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
             context.TemperatureReadings.Add(temperatureReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -90,7 +90,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Temperature && !emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Temperature && !emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (emailNotification.NotificationThreshold == Threshold.Under && temperature <= emailNotification.ThresholdValue)
                     {
@@ -110,7 +110,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddVelocityReading(float velocity, string sensorName, string userId, DateTime timeOfMeasurement)
         {
-            VelocityReading velocityReading = new() { Velocity = velocity, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
+            VelocityReading velocityReading = new() { Velocity = velocity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
             context.VelocityReadings.Add(velocityReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -121,7 +121,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Velocity && !emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Velocity && !emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (emailNotification.NotificationThreshold == Threshold.Under && velocity <= emailNotification.ThresholdValue)
                     {
@@ -141,7 +141,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddBinaryReading(int binary, string sensorName, string userId, DateTime timeOfMeasurement, ReadingType readingType)
         {
-            BinaryReading binaryReading = new() { Binary = binary, UserId = userId, TimeOfMeasurement = timeOfMeasurement, ReadingType = readingType };
+            BinaryReading binaryReading = new() { Binary = binary, UserId = userId, TimeOfMeasurement = timeOfMeasurement, ReadingType = readingType, SensorName = sensorName };
 
             context.BinaryReadings.Add(binaryReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -152,7 +152,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == readingType && emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == readingType && emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (binary == 1)
                     {
@@ -167,7 +167,7 @@ namespace IoTCloud.Services
 
         public async Task<bool> AddHumidityReading(float humidity, string sensorName, string userId, DateTime timeOfMeasurement)
         {
-            HumidityReading humidityReading = new() { Humidity = humidity, UserId = userId, TimeOfMeasurement = timeOfMeasurement };
+            HumidityReading humidityReading = new() { Humidity = humidity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
             context.HumidityReadings.Add(humidityReading);
             var countOfSavedEntries = await context.SaveChangesAsync();
@@ -178,7 +178,7 @@ namespace IoTCloud.Services
 
             foreach (var emailNotification in emailNotifications)
             {
-                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Humidity && !emailNotification.IsBinary)
+                if (emailNotification.UserId == userId && emailNotification.ReadingType == ReadingType.Humidity && !emailNotification.IsBinary && emailNotification.SensorName == sensorName)
                 {
                     if (emailNotification.NotificationThreshold == Threshold.Under && humidity <= emailNotification.ThresholdValue)
                     {
@@ -238,81 +238,88 @@ namespace IoTCloud.Services
             return readings;
         }
 
-        public async Task<bool> RemoveDistanceReadings(string userId)
+        public async Task<bool> RemoveDistanceReadings(string userId, string sensorName)
         {
             using var connection = GetConnection();
             var sql = @"
                         DELETE dr
                         FROM DistanceReadings dr
-                        WHERE dr.UserId = @UserId";
+                        WHERE dr.UserId = @UserId
+                        AND dr.SensorName = @SensorName";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId, SensorName = sensorName });
 
             return affected > 0;
         }
 
-        public async Task<bool> RemoveLuminosityReadings(string userId)
+        public async Task<bool> RemoveLuminosityReadings(string userId, string sensorName)
         {
             using var connection = GetConnection();
             var sql = @"
                         DELETE lr
                         FROM LuminosityReadings lr
-                        WHERE dr.UserId = @UserId";
+                        WHERE lr.UserId = @UserId
+                        AND lr.SensorName = @SensorName";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId, SensorName = sensorName });
 
             return affected > 0;
         }
 
-        public async Task<bool> RemoveTemperatureReadings(string userId)
+        public async Task<bool> RemoveTemperatureReadings(string userId, string sensorName)
         {
             using var connection = GetConnection();
             var sql = @"
                         DELETE tr
                         FROM TemperatureReadings tr
-                        WHERE dr.UserId = @UserId";
+                        WHERE tr.UserId = @UserId
+                        AND tr.SensorName = @SensorName";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId, SensorName = sensorName });
 
             return affected > 0;
         }
 
-        public async Task<bool> RemoveVelocityReadings(string userId)
+        public async Task<bool> RemoveVelocityReadings(string userId, string sensorName)
         {
             using var connection = GetConnection();
             var sql = @"
                         DELETE vr
                         FROM VelocityReadings vr
-                        WHERE dr.UserId = @UserId";
+                        WHERE vr.UserId = @UserId
+                        AND vr.SensorName = @SensorName";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId, SensorName = sensorName });
 
             return affected > 0;
         }
 
-        public async Task<bool> RemoveBinaryReadings(string userId, ReadingType readingType)
+        public async Task<bool> RemoveBinaryReadings(string userId, ReadingType readingType, string sensorName)
         {
             var sql = @"
                         DELETE br
                         FROM BinaryReadings br
                         WHERE br.UserId = @UserId
-                        AND ReadingType = @ReadingType";
+                        AND br.ReadingType = @ReadingType
+                        AND br.SensorName = @SensorName";
+
             using var connection = GetConnection();
 
-            var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId, ReadingType = readingType });
+            var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId, ReadingType = readingType, SensorName = sensorName });
 
             return rowsAffected > 0;
         }
 
-        public async Task<bool> RemoveHumidityReadings(string userId)
+        public async Task<bool> RemoveHumidityReadings(string userId, string sensorName)
         {
             using var connection = GetConnection();
             var sql = @"
                         DELETE hr
                         FROM HumidityReadings hr
-                        WHERE hr.UserId = @UserId";
+                        WHERE hr.UserId = @UserId
+                        AND hr.SensorName = @SensorName";
 
-            var affected = await connection.ExecuteAsync(sql, new { UserId = userId });
+            var affected = await connection.ExecuteAsync(sql, new { UserId = userId, SensorName = sensorName });
 
             return affected > 0;
         }

@@ -5,7 +5,7 @@
 
 
 @* Header *@
-<FluentDialogHeader ShowDismiss="true">
+<FluentDialogHeader>
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
         <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
         <FluentLabel Typo="Typography.PaneHeader">
@@ -23,13 +23,14 @@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
         <FluentDataGrid Items="@Content.AsQueryable()">
-            <PropertyColumn Title="Notification for" Property="@(en => en.ReadingType)" />
-            <PropertyColumn Title="Over/Under" Property="@(en => en.NotificationThreshold)" />
-            <PropertyColumn title="Threshold value" Property="@(en => en.ThresholdValue)" />
-                <TemplateColumn Title="Actions">
-                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" OnClick="@(e => EditNotification(context))" />
-                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(e => DeleteNotification(context.Id))" />
-                </TemplateColumn>
+            <PropertyColumn Title="Notification for" Property="@(en => en.ReadingType)" Sortable="true" />
+            <PropertyColumn Title="Over/Under" Property="@(en => en.NotificationThreshold)" Sortable="true" />
+            <PropertyColumn Title="Threshold value" Property="@(en => en.ThresholdValue)" Sortable="true" />
+            <PropertyColumn Title="Sensor name" Property="@(en => en.SensorName)" Sortable="true" />
+            <TemplateColumn Title="Actions">
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" OnClick="@(e => EditNotification(context))" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(e => DeleteNotification(context.Id))" />
+            </TemplateColumn>
         </FluentDataGrid>
     </FluentStack>
 </FluentDialogBody>
@@ -52,7 +53,8 @@
         Dialog.Hide();
         var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(notification, new DialogParameters()
             {
-                Height = "600px",
+                Height = "500px",
+                Width = "700px",
                 Title = $"Edit an email notification",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,

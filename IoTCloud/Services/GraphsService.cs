@@ -25,8 +25,7 @@ namespace IoTCloud.Services
             var sql = @"
                         SELECT gi.*
                         FROM GraphItems gi
-                        LEFT JOIN AspNetUsers u ON gi.UserId = u.Id
-                        WHERE u.Id = @UserId";
+                        WHERE gi.UserId = @UserId";
 
             using var connection = GetConnection();
             var graphItems = await connection.QueryAsync<GraphItem>(sql, new { UserId = userId });
@@ -40,8 +39,7 @@ namespace IoTCloud.Services
             var sql = @"
                         DELETE gi
                         FROM GraphItems gi
-                        LEFT JOIN AspNetUsers u ON gi.UserId = u.Id
-                        WHERE u.Id = @UserId";
+                        WHERE gi.UserId = @UserId";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId });
 
@@ -55,6 +53,53 @@ namespace IoTCloud.Services
                         DELETE gi
                         FROM GraphItems gi
                         WHERE gi.Id = @Id";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> AddUserTable(TableItem item)
+        {
+            await context.TableItems.AddAsync(item);
+            var addedCount = await context.SaveChangesAsync();
+
+            return addedCount > 0;
+        }
+
+        public async Task<List<TableItem>> GetUserTables(string userId)
+        {
+            var sql = @"
+                        SELECT ti.*
+                        FROM TableItems ti
+                        WHERE ti.UserId = @UserId";
+
+            using var connection = GetConnection();
+            var tableItems = await connection.QueryAsync<TableItem>(sql, new { UserId = userId });
+
+            return tableItems.ToList();
+        }
+
+        public async Task<bool> DeleteUserTables(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE ti
+                        FROM TableItems ti
+                        WHERE ti.UserId = @UserId";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> DeleteTable(string id)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE ti
+                        FROM TableItems ti
+                        WHERE ti.Id = @Id";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
 

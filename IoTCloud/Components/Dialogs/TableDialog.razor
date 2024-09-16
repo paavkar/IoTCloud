@@ -1,4 +1,4 @@
-﻿@implements IDialogContentComponent<GraphItem>
+﻿@implements IDialogContentComponent<TableItem>
 
 @* Header *@
 <FluentDialogHeader>
@@ -19,21 +19,22 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
-        <FluentSelect Items=@dataTypeOptions
-                      OptionText="@(i => i.Text)"
-                      OptionValue="@(i => i.Value)"
-                      OptionSelected="@(i => i.Selected)"
-                          @bind-Value="@Content.DataType" />
-
-
-        <FluentRadioGroup @bind-Value=Content.GraphType Label="Select the chart type">
-            @foreach (ApexCharts.SeriesType item in Enum.GetValues<ApexCharts.SeriesType>())
+        <FluentRadioGroup @bind-Value=Content.ReadingType Label="Reading type of the data">
+            @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
-                <FluentRadio Value="@item">@item</FluentRadio>
+                if (item != ReadingType.Binary)
+                {
+                    <FluentRadio Value="@item">@item</FluentRadio>
+                }
             }
         </FluentRadioGroup>
 
-        <FluentTextField @bind-Value="@Content.Name">Graph title:</FluentTextField>
+        <FluentRadioGroup @bind-Value=Content.IsBinary Label="Is the table for binary values?">
+            <FluentRadio Value="true">Yes</FluentRadio>
+            <FluentRadio Value="false">No</FluentRadio>
+        </FluentRadioGroup>
+
+        <FluentTextField @bind-Value="@Content.Name">Table title:</FluentTextField>
 
         <FluentTextField @bind-Value="@Content.SensorName">What sensor should this graph be for?</FluentTextField>
     </FluentStack>
@@ -41,7 +42,7 @@
 
 @code {
     [Parameter]
-    public GraphItem Content { get; set; } = default!;
+    public TableItem Content { get; set; } = default!;
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
