@@ -221,7 +221,7 @@
                 await GetReadings(graph);
             }
         }
-        else if (Tables.Count > 0)
+        if (Tables.Count > 0)
         {
             foreach (var table in Tables)
             {
@@ -246,7 +246,7 @@
                 }
                 await InvokeAsync(StateHasChanged); 
             }
-            else if (Tables.Count > 0)
+            if (Tables.Count > 0)
             {
                 foreach (var table in Tables)
                 {

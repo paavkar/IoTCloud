@@ -63,7 +63,6 @@
         }
 
         var result = await UserManager.DeleteAsync(user);
-        var graphsDeleted = await GS.DeleteUserGraphs(user.Id);
         if (!result.Succeeded)
         {
             throw new InvalidOperationException("Unexpected error occurred deleting user.");
