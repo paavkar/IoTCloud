@@ -12,7 +12,7 @@ namespace IoTCloud.Models
         public int Binary { get; set; }
         public ReadingType ReadingType { get; set; }
         public string UserId { get; set; }
-        public DateTime TimeOfMeasurement { get; set; }
+        public DateTimeOffset TimeOfMeasurement { get; set; }
         public string SensorName { get; set; }
     }
 }

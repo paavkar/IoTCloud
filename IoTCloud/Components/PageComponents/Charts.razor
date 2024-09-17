@@ -6,11 +6,11 @@
             case "DistanceReading":
                 <ApexCharts.ApexChart TItem="DistanceReading"
                                       Title=@item.Name
-                                      Height=300 Width=400>
+                                      Height=300 Width=600>
                     <ApexCharts.ApexPointSeries TItem="DistanceReading"
-                                                Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName)"
+                                                Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName).OrderBy(dr => dr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
-                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().ToShortDateString()  + i.TimeOfMeasurement.ToLocalTime().ToLongTimeString()"
+                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
                                                 YValue="i => (decimal)i.Distance" />
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -18,11 +18,11 @@
             case "LuminosityReading":
                 <ApexCharts.ApexChart TItem="LuminosityReading"
                                       Title=@item.Name
-                                      Height=300 Width=400>
+                                      Height=300 Width=600>
                     <ApexCharts.ApexPointSeries TItem="LuminosityReading"
-                                                Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName)"
+                                                Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName).OrderBy(lr => lr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
-                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().ToShortDateString()  + i.TimeOfMeasurement.ToLocalTime().ToLongTimeString()"
+                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
                                                 YValue="i => (decimal)i.Luminosity" />
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -30,11 +30,11 @@
             case "TemperatureReading":
                 <ApexCharts.ApexChart TItem="TemperatureReading"
                                       Title=@item.Name
-                                      Height=300 Width=400>
+                                      Height=300 Width=600>
                     <ApexCharts.ApexPointSeries TItem="TemperatureReading"
-                                                Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName)"
+                                                Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName).OrderBy(tr => tr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
-                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().ToShortDateString()  + i.TimeOfMeasurement.ToLocalTime().ToLongTimeString()"
+                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
                                                 YValue="i => (decimal)i.Temperature" />
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -42,11 +42,11 @@
             case "VelocityReading":
                 <ApexCharts.ApexChart TItem="VelocityReading"
                                       Title=@item.Name
-                                      Height=300 Width=400>
+                                      Height=300 Width=600>
                     <ApexCharts.ApexPointSeries TItem="VelocityReading"
-                                                Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName)"
+                                                Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName).OrderBy(vr => vr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
-                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().ToShortDateString()  + i.TimeOfMeasurement.ToLocalTime().ToLongTimeString()"
+                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
                                                 YValue="i => (decimal)i.Velocity" />
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -54,11 +54,11 @@
             case "HumidityReading":
                 <ApexCharts.ApexChart TItem="HumidityReading"
                                       Title=@item.Name
-                                      Height=300 Width=400>
+                                      Height=300 Width=600>
                     <ApexCharts.ApexPointSeries TItem="HumidityReading"
-                                                Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName)"
+                                                Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName).OrderBy(hr => hr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
-                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().ToShortDateString()  + i.TimeOfMeasurement.ToLocalTime().ToLongTimeString()"
+                                                XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
                                                 YValue="i => (decimal)i.Humidity" />
                 </ApexCharts.ApexChart>
                 <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -82,6 +82,30 @@
     public List<HumidityReading> HumidityReadings { get; set; } = new();
     [Parameter]
     public EventCallback<string> OnRemoveGraph { get; set; }
+
+    private ApexCharts.ApexChartOptions<TemperatureReading> options { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        options = new()
+        {
+            Xaxis = new() 
+            { 
+                Labels = new() 
+                { 
+                    OffsetX = 0,
+                }
+            },
+            Markers = new() 
+            { 
+                Size = 6, 
+                Hover = new() 
+                { 
+                    Size = 6 
+                } 
+            }
+        };
+    }
 
     private async Task RemoveGraph(string id)
     {

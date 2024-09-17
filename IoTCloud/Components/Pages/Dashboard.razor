@@ -30,11 +30,11 @@
             </FluentAccordionItem>
         </FluentAccordion>
 
-        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="DeleteApiKey">Delete your API key.</FluentButton>
+        <FluentButton Style="margin-top: 0.6em;" BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="DeleteApiKey">Delete your API key.</FluentButton>
     }
     else
     {
-        <FluentLabel Style="margin-left: 1em;">You do not have an existing API key. Click the button to create one.</FluentLabel>
+        <FluentLabel Style="margin-left: 1em; margin-top: 0.6em;">You do not have an existing API key. Click the button to create one.</FluentLabel>
     }
 </FluentStack>
 
@@ -100,7 +100,7 @@
                         <FluentStack>
                             <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Distance" Property="@(t => t.Distance)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -110,7 +110,7 @@
                         <FluentStack>
                             <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Luminosity" Property="@(t => t.Luminosity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -120,7 +120,7 @@
                         <FluentStack>
                             <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Temperature" Property="@(t => t.Temperature)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -130,7 +130,7 @@
                         <FluentStack>
                             <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Velocity" Property="@(t => t.Velocity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -140,7 +140,7 @@
                         <FluentStack>
                             <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Humidity" Property="@(t => t.Humidity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -154,7 +154,7 @@
                     <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).AsQueryable()">
                         <PropertyColumn Title="Binary" Property="@(b => b.Binary)" Sortable="true" />
                         <PropertyColumn Title="Reading type" Property="@(b => b.ReadingType)" Sortable="true" />
-                        <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
                         <PropertyColumn Title="Sensor name" Property="@(b => b.SensorName)" Sortable="true" />
                     </FluentDataGrid>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -171,9 +171,13 @@
                     {
                         <span style="height: 250px; width: 250px; background-color: red; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
                     }
-                    else
+                    else if (item.Binary == 0)
                     {
                         <span style="height: 250px; width: 250px; background-color: green; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
+                    }
+                    else
+                    {
+                        <span style="height: 250px; width: 250px; background-color: grey; border-radius: 50%; display: inline-block;"></span>
                     }
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
                 </FluentStack>
@@ -244,7 +248,6 @@
                 {
                     await GetReadings(graph);
                 }
-                await InvokeAsync(StateHasChanged); 
             }
             if (Tables.Count > 0)
             {
@@ -252,7 +255,6 @@
                 {
                     await GetReadings(table);
                 }
-                await InvokeAsync(StateHasChanged);
             }
             if (BinaryGraphs.Count > 0)
             {

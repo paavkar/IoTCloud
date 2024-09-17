@@ -18,7 +18,7 @@ namespace IoTCloud.Controllers
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
 
-            var isOperationSuccessful = await readingsService.AddDistanceReading(distance, sensorName, existingKey.UserId, DateTime.Now);
+            var isOperationSuccessful = await readingsService.AddDistanceReading(distance, sensorName, existingKey.UserId, DateTimeOffset.Now);
 
             if (!isOperationSuccessful)
             {
@@ -38,7 +38,7 @@ namespace IoTCloud.Controllers
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
 
-            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName, existingKey.UserId, DateTime.Now, ReadingType.Distance);
+            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName, existingKey.UserId, DateTimeOffset.Now, ReadingType.Distance);
 
             if (!isOperationSuccessful)
             {

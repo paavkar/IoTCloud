@@ -10,7 +10,7 @@ namespace IoTCloud.Models
         public string Id { get; set; }
         public float Temperature { get; set; }
         public string UserId { get; set; }
-        public DateTime TimeOfMeasurement { get; set; }
+        public DateTimeOffset TimeOfMeasurement { get; set; }
         public string SensorName { get; set; }
     }
 }

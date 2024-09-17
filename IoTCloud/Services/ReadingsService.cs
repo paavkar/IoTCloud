@@ -15,7 +15,7 @@ namespace IoTCloud.Services
             return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
         }
 
-        public async Task<bool> AddDistanceReading(float distance, string sensorName, string userId, DateTime timeOfMeasurement)
+        public async Task<bool> AddDistanceReading(float distance, string sensorName, string userId, DateTimeOffset timeOfMeasurement)
         {
             DistanceReading distanceReading = new() { Distance = distance, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
@@ -46,7 +46,7 @@ namespace IoTCloud.Services
             return true;
         }
 
-        public async Task<bool> AddLuminosityReading(float luminosity, string sensorName, string userId, DateTime timeOfMeasurement)
+        public async Task<bool> AddLuminosityReading(float luminosity, string sensorName, string userId, DateTimeOffset timeOfMeasurement)
         {
             LuminosityReading luminosityReading = new() { Luminosity = luminosity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
@@ -77,7 +77,7 @@ namespace IoTCloud.Services
             return true;
         }
 
-        public async Task<bool> AddTemperatureReading(float temperature, string sensorName, string userId, DateTime timeOfMeasurement)
+        public async Task<bool> AddTemperatureReading(float temperature, string sensorName, string userId, DateTimeOffset timeOfMeasurement)
         {
             TemperatureReading temperatureReading = new() { Temperature = temperature, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
@@ -108,7 +108,7 @@ namespace IoTCloud.Services
             return true;
         }
 
-        public async Task<bool> AddVelocityReading(float velocity, string sensorName, string userId, DateTime timeOfMeasurement)
+        public async Task<bool> AddVelocityReading(float velocity, string sensorName, string userId, DateTimeOffset timeOfMeasurement)
         {
             VelocityReading velocityReading = new() { Velocity = velocity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
@@ -139,7 +139,7 @@ namespace IoTCloud.Services
             return true;
         }
 
-        public async Task<bool> AddBinaryReading(int binary, string sensorName, string userId, DateTime timeOfMeasurement, ReadingType readingType)
+        public async Task<bool> AddBinaryReading(int binary, string sensorName, string userId, DateTimeOffset timeOfMeasurement, ReadingType readingType)
         {
             BinaryReading binaryReading = new() { Binary = binary, UserId = userId, TimeOfMeasurement = timeOfMeasurement, ReadingType = readingType, SensorName = sensorName };
 
@@ -165,7 +165,7 @@ namespace IoTCloud.Services
             return true;
         }
 
-        public async Task<bool> AddHumidityReading(float humidity, string sensorName, string userId, DateTime timeOfMeasurement)
+        public async Task<bool> AddHumidityReading(float humidity, string sensorName, string userId, DateTimeOffset timeOfMeasurement)
         {
             HumidityReading humidityReading = new() { Humidity = humidity, UserId = userId, TimeOfMeasurement = timeOfMeasurement, SensorName = sensorName };
 
