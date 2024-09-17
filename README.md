@@ -18,9 +18,7 @@ The app is running on Azure: https://pk-iotcloud.azurewebsites.net/
 You can send five primary kind of data and binary data that corresponds to these five data types.
 The types are Distance, Humidity, Luminosity, Temperature and Velocity. Next I'll overview the usage of the REST API.
 
-## Sending data
-
-### Distance
+## Distance
 
 An example URL: ``https://pk-iotcloud.azurewebsites.net/api/Distance/add?apiKey={your_api_key}=&distance={distance_value}&sensorName={your_chosen_sensor_name}``
 
@@ -34,25 +32,25 @@ Binary value (as is the name) can only receive values 1 or 0. You can create a g
 
 The rest of the data follow similar pattern which I will give examples in their respective sections
 
-### Humidity
+## Humidity
 
 Regular: ``https://pk-iotcloud.azurewebsites.net/api/Humidity/add?apiKey={your_api_key}=&humidity={humidity_value}&sensorName={your_chosen_sensor_name}``
 
 Binary: ``https://pk-iotcloud.azurewebsites.net/api/Humidity/addBinary?apiKey={your_api_key}=&binary={binary_value}&sensorName={your_chosen_sensor_name}``
 
-### Luminosity
+## Luminosity
 
 Regular: ``https://pk-iotcloud.azurewebsites.net/api/Luminosity/add?apiKey={your_api_key}=&luminosity={luminosity_value}&sensorName={your_chosen_sensor_name}``
 
 Binary: ``https://pk-iotcloud.azurewebsites.net/api/Luminosity/addBinary?apiKey={your_api_key}=&binary={binary_value}&sensorName={your_chosen_sensor_name}``
 
-### Temperature
+## Temperature
 
 Regular: ``https://pk-iotcloud.azurewebsites.net/api/Temperature/add?apiKey={your_api_key}=&temperature={temperature_value}&sensorName={your_chosen_sensor_name}``
 
 Binary: ``https://pk-iotcloud.azurewebsites.net/api/Temperature/addBinary?apiKey={your_api_key}=&binary={binary_value}&sensorName={your_chosen_sensor_name}``
 
-### Velocity
+## Velocity
 
 Regular: ``https://pk-iotcloud.azurewebsites.net/api/Velocity/add?apiKey={your_api_key}=&velocity={velocity_value}&sensorName={your_chosen_sensor_name}``
 
