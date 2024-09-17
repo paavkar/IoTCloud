@@ -1,4 +1,4 @@
-﻿@implements IDialogContentComponent<TableItem>
+﻿@implements IDialogContentComponent<BinaryGraphItem>
 
 @* Header *@
 <FluentDialogHeader>
@@ -29,20 +29,15 @@
             }
         </FluentRadioGroup>
 
-        <FluentRadioGroup @bind-Value=Content.IsBinary Label="Is the table for binary values?">
-            <FluentRadio Value="true">Yes</FluentRadio>
-            <FluentRadio Value="false">No</FluentRadio>
-        </FluentRadioGroup>
+        <FluentTextField @bind-Value="@Content.Name">Graph title:</FluentTextField>
 
-        <FluentTextField @bind-Value="@Content.Name">Table title:</FluentTextField>
-
-        <FluentTextField @bind-Value="@Content.SensorName">What sensor should this table be for?</FluentTextField>
+        <FluentTextField @bind-Value="@Content.SensorName">What sensor should this graph be for?</FluentTextField>
     </FluentStack>
 </FluentDialogBody>
 
 @code {
     [Parameter]
-    public TableItem Content { get; set; } = default!;
+    public BinaryGraphItem Content { get; set; } = default!;
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;

@@ -5,7 +5,8 @@
         {
             case "DistanceReading":
                 <ApexCharts.ApexChart TItem="DistanceReading"
-                                      Title=@item.Name>
+                                      Title=@item.Name
+                                      Height=300 Width=400>
                     <ApexCharts.ApexPointSeries TItem="DistanceReading"
                                                 Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
@@ -16,7 +17,8 @@
                 break;
             case "LuminosityReading":
                 <ApexCharts.ApexChart TItem="LuminosityReading"
-                                      Title=@item.Name>
+                                      Title=@item.Name
+                                      Height=300 Width=400>
                     <ApexCharts.ApexPointSeries TItem="LuminosityReading"
                                                 Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
@@ -27,7 +29,8 @@
                 break;
             case "TemperatureReading":
                 <ApexCharts.ApexChart TItem="TemperatureReading"
-                                      Title=@item.Name>
+                                      Title=@item.Name
+                                      Height=300 Width=400>
                     <ApexCharts.ApexPointSeries TItem="TemperatureReading"
                                                 Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
@@ -38,7 +41,8 @@
                 break;
             case "VelocityReading":
                 <ApexCharts.ApexChart TItem="VelocityReading"
-                                      Title=@item.Name>
+                                      Title=@item.Name
+                                      Height=300 Width=400>
                     <ApexCharts.ApexPointSeries TItem="VelocityReading"
                                                 Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType
@@ -49,7 +53,8 @@
                 break;
             case "HumidityReading":
                 <ApexCharts.ApexChart TItem="HumidityReading"
-                                      Title=@item.Name>
+                                      Title=@item.Name
+                                      Height=300 Width=400>
                     <ApexCharts.ApexPointSeries TItem="HumidityReading"
                                                 Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName)"
                                                 SeriesType=item.GraphType

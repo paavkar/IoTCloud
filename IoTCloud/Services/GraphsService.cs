@@ -105,5 +105,52 @@ namespace IoTCloud.Services
 
             return rowsAffected > 0;
         }
+
+        public async Task<bool> AddUserBinaryGraph(BinaryGraphItem item)
+        {
+            await context.BinaryGraphItems.AddAsync(item);
+            var addedCount = await context.SaveChangesAsync();
+
+            return addedCount > 0;
+        }
+
+        public async Task<List<BinaryGraphItem>> GetUserBinaryGraphItems(string userId)
+        {
+            var sql = @"
+                        SELECT bi.*
+                        FROM BinaryGraphItems bi
+                        WHERE bi.UserId = @UserId";
+
+            using var connection = GetConnection();
+            var tableItems = await connection.QueryAsync<BinaryGraphItem>(sql, new { UserId = userId });
+
+            return tableItems.ToList();
+        }
+
+        public async Task<bool> DeleteUserBinaryGraphs(string userId)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE bi
+                        FROM BinaryGraphItems bi
+                        WHERE bi.UserId = @UserId";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new { UserId = userId });
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> DeleteBinaryGraph(string id)
+        {
+            using var connection = GetConnection();
+            var sql = @"
+                        DELETE bi
+                        FROM BinaryGraphItems bi
+                        WHERE bi.Id = @Id";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
+
+            return rowsAffected > 0;
+        }
     }
 }

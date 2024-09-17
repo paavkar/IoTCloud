@@ -33,12 +33,12 @@ namespace IoTCloud.Services
                     if (emailNotification.NotificationThreshold == Threshold.Under && distance <= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {distance}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance alert", emailNotification.NotificationMessage);
                     }
                     else if (emailNotification.NotificationThreshold == Threshold.Over && distance >= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {distance}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Distance alert", emailNotification.NotificationMessage);
                     }
                 }
             }
@@ -64,12 +64,12 @@ namespace IoTCloud.Services
                     if (emailNotification.NotificationThreshold == Threshold.Under && luminosity <= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity alert", emailNotification.NotificationMessage);
                     }
                     else if (emailNotification.NotificationThreshold == Threshold.Over && luminosity >= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {luminosity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Luminosity alert", emailNotification.NotificationMessage);
                     }
                 }
             }
@@ -95,12 +95,12 @@ namespace IoTCloud.Services
                     if (emailNotification.NotificationThreshold == Threshold.Under && temperature <= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature alert", emailNotification.NotificationMessage);
                     }
                     else if (emailNotification.NotificationThreshold == Threshold.Over && temperature >= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {temperature}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Temperature alert", emailNotification.NotificationMessage);
                     }
                 }
             }
@@ -126,12 +126,12 @@ namespace IoTCloud.Services
                     if (emailNotification.NotificationThreshold == Threshold.Under && velocity <= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity alert", emailNotification.NotificationMessage);
                     }
                     else if (emailNotification.NotificationThreshold == Threshold.Over && velocity >= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {velocity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Velocity alert", emailNotification.NotificationMessage);
                     }
                 }
             }
@@ -156,7 +156,7 @@ namespace IoTCloud.Services
                 {
                     if (binary == 1)
                     {
-                        emailNotification.NotificationMessage += $" This notification was for a {emailNotification.ReadingType} sensor.";
+                        emailNotification.NotificationMessage += $" This alert was for a {emailNotification.ReadingType} sensor.";
                         await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Binary notification", emailNotification.NotificationMessage);
                     }
                 }
@@ -183,12 +183,12 @@ namespace IoTCloud.Services
                     if (emailNotification.NotificationThreshold == Threshold.Under && humidity <= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {humidity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Humidity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Humidity alert", emailNotification.NotificationMessage);
                     }
                     else if (emailNotification.NotificationThreshold == Threshold.Over && humidity >= emailNotification.ThresholdValue)
                     {
                         emailNotification.NotificationMessage += $" The sensor value was: {humidity}";
-                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Humidity notification", emailNotification.NotificationMessage);
+                        await emailSender.SendEmailAsync(emailNotification.Email, "IoTCloud - Humidity alert", emailNotification.NotificationMessage);
                     }
                 }
             }

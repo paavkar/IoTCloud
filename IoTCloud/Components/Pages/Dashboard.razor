@@ -46,6 +46,7 @@
     <FluentStack>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddTable">Add data table</FluentButton>
+        <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddBinaryGraph">Add binary graph</FluentButton>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification">Set up email notification</FluentButton>
         @if (EmailNotifications.Any())
         {
@@ -160,6 +161,24 @@
                 </FluentStack>
             }
         }
+        @foreach (var graph in BinaryGraphs)
+        {
+            if (BinaryReadings.Count > 0 && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).OrderByDescending(br => br.TimeOfMeasurement).First() }.Count > 0)
+            {
+                BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).OrderByDescending(br => br.TimeOfMeasurement).First() }.First();
+                <FluentStack>
+                    @if (item.Binary == 1)
+                    {
+                        <span style="height: 250px; width: 250px; background-color: red; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
+                    }
+                    else
+                    {
+                        <span style="height: 250px; width: 250px; background-color: green; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
+                    }
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
+                </FluentStack>
+            }
+        }
     </FluentStack>
 </FluentStack>
 
@@ -173,6 +192,7 @@
 
     private List<GraphItem> Graphs { get; set; } = new();
     private List<TableItem> Tables { get; set; } = new();
+    private List<BinaryGraphItem> BinaryGraphs { get; set; } = new();
     private List<DistanceReading> DistanceReadings { get; set; } = new();
     private List<LuminosityReading> LuminosityReadings { get; set; } = new();
     private List<TemperatureReading> TemperatureReadings { get; set; } = new();
@@ -192,6 +212,8 @@
 
         Graphs = await GS.GetUserGraphs(user.Id);
         Tables = await GS.GetUserTables(user.Id);
+        BinaryGraphs = await GS.GetUserBinaryGraphItems(user.Id);
+
         if (Graphs.Count > 0)
         {
             foreach (var graph in Graphs)
@@ -204,6 +226,13 @@
             foreach (var table in Tables)
             {
                 await GetReadings(table);
+            }
+        }
+        if (BinaryGraphs.Count > 0)
+        {
+            foreach (var graph in BinaryGraphs)
+            {
+                await GetBinaryReadings();
             }
         }
 
@@ -224,6 +253,13 @@
                     await GetReadings(table);
                 }
                 await InvokeAsync(StateHasChanged);
+            }
+            if (BinaryGraphs.Count > 0)
+            {
+                foreach (var graph in BinaryGraphs)
+                {
+                    await GetBinaryReadings();
+                }
             }
 
         }, null, 0, 15000);
@@ -271,6 +307,12 @@
                 HumidityReadings = await RS.GetHumidityReadings(user.Id);
                 break;
         }
+    }
+
+    private async Task GetBinaryReadings()
+    {
+        BinaryReadings = await RS.GetBinaryReadings(user.Id);
+        await InvokeAsync(StateHasChanged);
     }
 
     public async void CreateApiKey()
@@ -329,6 +371,32 @@
 
             await GetReadings(item);
             Tables.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    public async void AddBinaryGraph()
+    {
+        var dialog = await DialogService.ShowDialogAsync<AddBinaryGraphDialog>(new BinaryGraphItem(), new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Add a new binary graph",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            BinaryGraphItem item = (BinaryGraphItem)result.Data;
+
+            item.UserId = user.Id;
+
+            await GS.AddUserBinaryGraph(item);
+
+            await GetBinaryReadings();
+            BinaryGraphs.Add(item);
             StateHasChanged();
         }
     }
@@ -495,6 +563,16 @@
         }
     }
 
+    private async Task RemoveBinaryGraph(string id)
+    {
+        var result = await GS.DeleteBinaryGraph(id);
+
+        if (result)
+        {
+            BinaryGraphs.Remove(BinaryGraphs.Find(bg => bg.Id == id));
+        }
+    }
+
     private async void SetupEmailNotification()
     {
         EmailNotification emailNotification = new() { UserId = user.Id };
@@ -503,7 +581,7 @@
             {
                 Height = "500px",
                 Width = "700px",
-                Title = $"Set up a new email notification",
+                Title = $"Set up a new email alert",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
                 ShowDismiss = false
@@ -524,11 +602,11 @@
                 ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
                     {
                         Intent = ToastIntent.Success,
-                        Title = "Email notification result",
+                        Title = "Email alert result",
                         Timeout = 5000,
                         Content = new CommunicationToastContent()
                         {
-                            Details = "Email notification has been set up successfully!",
+                            Details = "Email alert has been set up successfully!",
                         }
                     });
             }
@@ -537,11 +615,11 @@
                 ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
                     {
                         Intent = ToastIntent.Error,
-                        Title = "Email notification result",
+                        Title = "Email alert result",
                         Timeout = 5000,
                         Content = new CommunicationToastContent()
                         {
-                            Details = "There was an error setting up the email notification!",
+                            Details = "There was an error setting up the email alert!",
                         }
                     });
             }
@@ -554,7 +632,7 @@
             {
                 Height = "600px",
                 Width = "800px",
-                Title = $"Your email notifications",
+                Title = $"Your email alerts",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
                 ShowDismiss = false

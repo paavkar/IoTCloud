@@ -13,5 +13,10 @@ namespace IoTCloud.Services
         Task<List<TableItem>> GetUserTables(string userId);
         Task<bool> DeleteUserTables(string userId);
         Task<bool> DeleteTable(string id);
+
+        Task<bool> AddUserBinaryGraph(BinaryGraphItem item);
+        Task<List<BinaryGraphItem>> GetUserBinaryGraphItems(string userId);
+        Task<bool> DeleteUserBinaryGraphs(string userId);
+        Task<bool> DeleteBinaryGraph(string id);
     }
 }

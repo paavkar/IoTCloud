@@ -27,6 +27,7 @@ namespace IoTCloud.Controllers
         [HttpGet("addBinary")]
         public async Task<IActionResult> AddReading(string apiKey, string sensorName, int binary)
         {
+            if (binary > 1 || binary < 0) return BadRequest("Invalid value given.");
             var existingKey = await userService.CheckApiKeyExistsAsync(apiKey);
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
