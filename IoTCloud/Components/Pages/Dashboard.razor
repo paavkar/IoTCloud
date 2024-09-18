@@ -48,6 +48,8 @@
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddTable">Add data table</FluentButton>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddBinaryGraph">Add binary graph</FluentButton>
         <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="SetupEmailNotification">Set up email notification</FluentButton>
+    </FluentStack>
+    <FluentStack>
         @if (EmailNotifications.Any())
         {
             <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="OpenEmailNotificationsDialog">Open email notifications</FluentButton>
@@ -73,9 +75,6 @@
             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveHumidityReadings">Remove Humidity Readings</FluentButton>
         }
     </FluentStack>
-
-
-    
 </FluentStack>
 
 <FluentDivider Style="margin-top: 1em; margin-bottom: 1em;" />
@@ -163,10 +162,10 @@
         }
         @foreach (var graph in BinaryGraphs)
         {
-            if (BinaryReadings.Count > 0 && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.Count > 0)
+            if (BinaryReadings.Count > 0@*  && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.Count > 0 *@)
             {
                 BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.First();
-                <FluentStack>
+                <FluentStack Style="margin-top: 1em;">
                     @if (item.Binary == 1)
                     {
                         <span style="height: 250px; width: 250px; background-color: red; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
@@ -175,10 +174,13 @@
                     {
                         <span style="height: 250px; width: 250px; background-color: green; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
                     }
-                    else
-                    {
-                        <span style="height: 250px; width: 250px; background-color: grey; border-radius: 50%; display: inline-block;"></span>
-                    }
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
+                </FluentStack>
+            }
+            else
+            {
+                <FluentStack Style="margin-top: 1em;">
+                    <span style="height: 250px; width: 250px; background-color: grey; border-radius: 50%; display: inline-block;"></span>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
                 </FluentStack>
             }
@@ -248,8 +250,9 @@
                 {
                     await GetReadings(graph);
                 }
+                await InvokeAsync(StateHasChanged);
             }
-            if (Tables.Count > 0)
+            else if (Tables.Count > 0)
             {
                 foreach (var table in Tables)
                 {
@@ -263,6 +266,7 @@
                 {
                     await GetBinaryReadings();
                 }
+                await InvokeAsync(StateHasChanged);
             }
 
         }, null, 0, 15000);
@@ -400,7 +404,7 @@
 
             await GetBinaryReadings();
             BinaryGraphs.Add(item);
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 

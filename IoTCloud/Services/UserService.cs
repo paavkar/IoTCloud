@@ -16,7 +16,6 @@ namespace IoTCloud.Services
 
         public async Task<ApiKey?> CheckApiKeyExistsAsync(string apiKey)
         {
-            Console.WriteLine(apiKey);
             apiKey = apiKey.Replace(" ", "+");
             var existingKey = await context.ApiKeys.FirstOrDefaultAsync(ak => ak.ApiKeyId == apiKey);
 
