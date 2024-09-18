@@ -6,7 +6,8 @@
             case "DistanceReading":
                 <ApexCharts.ApexChart TItem="DistanceReading"
                                       Title=@item.Name
-                                      Height=300 Width=600>
+                                      Height=300 Width=600
+                                      @ref="DistanceChart">
                     <ApexCharts.ApexPointSeries TItem="DistanceReading"
                                                 Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName).OrderBy(dr => dr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
@@ -18,7 +19,8 @@
             case "LuminosityReading":
                 <ApexCharts.ApexChart TItem="LuminosityReading"
                                       Title=@item.Name
-                                      Height=300 Width=600>
+                                      Height=300 Width=600
+                                      @ref="LuminosityChart">
                     <ApexCharts.ApexPointSeries TItem="LuminosityReading"
                                                 Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName).OrderBy(lr => lr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
@@ -30,7 +32,8 @@
             case "TemperatureReading":
                 <ApexCharts.ApexChart TItem="TemperatureReading"
                                       Title=@item.Name
-                                      Height=300 Width=600>
+                                      Height=300 Width=600
+                                      @ref="TemperatureChart">
                     <ApexCharts.ApexPointSeries TItem="TemperatureReading"
                                                 Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName).OrderBy(tr => tr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
@@ -42,7 +45,8 @@
             case "VelocityReading":
                 <ApexCharts.ApexChart TItem="VelocityReading"
                                       Title=@item.Name
-                                      Height=300 Width=600>
+                                      Height=300 Width=600
+                                      @ref="VelocityChart">
                     <ApexCharts.ApexPointSeries TItem="VelocityReading"
                                                 Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName).OrderBy(vr => vr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
@@ -54,7 +58,8 @@
             case "HumidityReading":
                 <ApexCharts.ApexChart TItem="HumidityReading"
                                       Title=@item.Name
-                                      Height=300 Width=600>
+                                      Height=300 Width=600
+                                      @ref="HumidityChart">
                     <ApexCharts.ApexPointSeries TItem="HumidityReading"
                                                 Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName).OrderBy(hr => hr.TimeOfMeasurement)"
                                                 SeriesType=item.GraphType
@@ -83,6 +88,13 @@
     [Parameter]
     public EventCallback<string> OnRemoveGraph { get; set; }
 
+
+    private ApexCharts.ApexChart<DistanceReading> DistanceChart = new();
+    private ApexCharts.ApexChart<LuminosityReading> LuminosityChart = new();
+    private ApexCharts.ApexChart<TemperatureReading> TemperatureChart = new();
+    private ApexCharts.ApexChart<VelocityReading> VelocityChart = new();
+    private ApexCharts.ApexChart<HumidityReading> HumidityChart = new();
+
     private ApexCharts.ApexChartOptions<TemperatureReading> options { get; set; } = new();
 
     protected override void OnInitialized()
@@ -105,6 +117,18 @@
                 } 
             }
         };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            await DistanceChart.UpdateSeriesAsync(true);
+            await LuminosityChart.UpdateSeriesAsync(true);
+            await TemperatureChart.UpdateSeriesAsync(true);
+            await VelocityChart.UpdateSeriesAsync(true);
+            await HumidityChart.UpdateSeriesAsync(true);
+        }
     }
 
     private async Task RemoveGraph(string id)
