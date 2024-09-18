@@ -98,9 +98,9 @@
                 {
                     case ReadingType.Distance:
                         <FluentStack>
-                            <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).OrderByDescending(dr => dr.TimeOfMeasurement).AsQueryable()">
+                            <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Distance" Property="@(t => t.Distance)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -108,9 +108,9 @@
                         break;
                     case ReadingType.Luminosity:
                         <FluentStack>
-                            <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).OrderByDescending(lr => lr.TimeOfMeasurement).AsQueryable()">
+                            <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Luminosity" Property="@(t => t.Luminosity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -118,9 +118,9 @@
                         break;
                     case ReadingType.Temperature:
                         <FluentStack>
-                            <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).OrderByDescending(tr => tr.TimeOfMeasurement).AsQueryable()">
+                            <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Temperature" Property="@(t => t.Temperature)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -128,9 +128,9 @@
                         break;
                     case ReadingType.Velocity:
                         <FluentStack>
-                            <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).OrderByDescending(vr => vr.TimeOfMeasurement).AsQueryable()">
+                            <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Velocity" Property="@(t => t.Velocity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -138,9 +138,9 @@
                         break;
                     case ReadingType.Humidity:
                         <FluentStack>
-                            <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).OrderByDescending(hr => hr.TimeOfMeasurement).AsQueryable()">
+                            <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).AsQueryable()">
                                 <PropertyColumn Title="Humidity" Property="@(t => t.Humidity)" Sortable="true" />
-                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                             </FluentDataGrid>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -151,10 +151,10 @@
             else
             {
                 <FluentStack>
-                    <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).OrderByDescending(br => br.TimeOfMeasurement).AsQueryable()">
+                    <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).AsQueryable()">
                         <PropertyColumn Title="Binary" Property="@(b => b.Binary)" Sortable="true" />
                         <PropertyColumn Title="Reading type" Property="@(b => b.ReadingType)" Sortable="true" />
-                        <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime().DateTime)" Sortable="true" />
+                        <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                         <PropertyColumn Title="Sensor name" Property="@(b => b.SensorName)" Sortable="true" />
                     </FluentDataGrid>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -163,9 +163,9 @@
         }
         @foreach (var graph in BinaryGraphs)
         {
-            if (BinaryReadings.Count > 0 && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).OrderByDescending(br => br.TimeOfMeasurement).First() }.Count > 0)
+            if (BinaryReadings.Count > 0 && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.Count > 0)
             {
-                BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).OrderByDescending(br => br.TimeOfMeasurement).First() }.First();
+                BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.First();
                 <FluentStack>
                     @if (item.Binary == 1)
                     {
@@ -255,6 +255,7 @@
                 {
                     await GetReadings(table);
                 }
+                await InvokeAsync(StateHasChanged);
             }
             if (BinaryGraphs.Count > 0)
             {

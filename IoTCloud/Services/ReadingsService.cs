@@ -198,42 +198,42 @@ namespace IoTCloud.Services
 
         public async Task<List<DistanceReading>> GetDistanceReadings(string userId)
         {
-            var readings = await context.DistanceReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.DistanceReadings.Where(tr => tr.UserId == userId).OrderByDescending(dr => dr.TimeOfMeasurement).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<LuminosityReading>> GetLuminosityReadings(string userId)
         {
-            var readings = await context.LuminosityReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.LuminosityReadings.Where(lr => lr.UserId == userId).OrderByDescending(lr => lr.TimeOfMeasurement).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<TemperatureReading>> GetTemperatureReadings(string userId)
         {
-            var readings = await context.TemperatureReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.TemperatureReadings.Where(tr => tr.UserId == userId).OrderByDescending(tr => tr.TimeOfMeasurement).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<VelocityReading>> GetVelocityReadings(string userId)
         {
-            var readings = await context.VelocityReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.VelocityReadings.Where(vr => vr.UserId == userId).OrderByDescending(vr => vr.TimeOfMeasurement).ToListAsync();
 
             return readings;
         }
 
         public async Task<List<BinaryReading>> GetBinaryReadings(string userId)
         {
-            var binaryReadings = await context.BinaryReadings.Where(br => br.UserId == userId).ToListAsync();
+            var binaryReadings = await context.BinaryReadings.Where(br => br.UserId == userId).OrderByDescending(br => br.TimeOfMeasurement).ToListAsync();
 
             return binaryReadings;
         }
 
         public async Task<List<HumidityReading>> GetHumidityReadings(string userId)
         {
-            var readings = await context.HumidityReadings.Where(tr => tr.UserId == userId).ToListAsync();
+            var readings = await context.HumidityReadings.Where(hr => hr.UserId == userId).OrderByDescending(hr => hr.TimeOfMeasurement).ToListAsync();
 
             return readings;
         }
