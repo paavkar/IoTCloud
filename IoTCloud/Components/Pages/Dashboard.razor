@@ -1,4 +1,5 @@
 ﻿@page "/dashboard"
+@using System.Timers
 @rendermode InteractiveServer
 
 @implements IDisposable
@@ -207,7 +208,7 @@
     private List<HumidityReading> HumidityReadings { get; set; } = new();
     private List<EmailNotification> EmailNotifications { get; set; } = new();
 
-    private Timer? timer;
+    private System.Timers.Timer timer = new(15000);
 
     protected override async Task OnInitializedAsync()
     {
@@ -242,34 +243,37 @@
             }
         }
 
-        timer = new (async _ =>
-        {
-            if (Graphs.Count > 0)
-            {
-                foreach (var graph in Graphs)
-                {
-                    await GetReadings(graph);
-                }
-                await InvokeAsync(StateHasChanged);
-            }
-            else if (Tables.Count > 0)
-            {
-                foreach (var table in Tables)
-                {
-                    await GetReadings(table);
-                }
-                await InvokeAsync(StateHasChanged);
-            }
-            if (BinaryGraphs.Count > 0)
-            {
-                foreach (var graph in BinaryGraphs)
-                {
-                    await GetBinaryReadings();
-                }
-                await InvokeAsync(StateHasChanged);
-            }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
 
-        }, null, 0, 15000);
+    private async void OnTimedEvent(object source, ElapsedEventArgs e)
+    {
+        if (Graphs.Count > 0)
+        {
+            foreach (var graph in Graphs)
+            {
+                await GetReadings(graph);
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        else if (Tables.Count > 0)
+        {
+            foreach (var table in Tables)
+            {
+                await GetReadings(table);
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        if (BinaryGraphs.Count > 0)
+        {
+            foreach (var graph in BinaryGraphs)
+            {
+                await GetBinaryReadings();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task GetReadings(GraphItem item)
@@ -332,6 +336,7 @@
 
     public async void AddGraph()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
             {
                 Height = "400px",
@@ -352,12 +357,14 @@
 
             await GetReadings(item);
             Graphs.Add(item);
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
         }
     }
 
     public async void AddTable()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<TableDialog>(new TableItem(), new DialogParameters()
             {
                 Height = "400px",
@@ -378,12 +385,14 @@
 
             await GetReadings(item);
             Tables.Add(item);
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
         }
     }
 
     public async void AddBinaryGraph()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<AddBinaryGraphDialog>(new BinaryGraphItem(), new DialogParameters()
             {
                 Height = "400px",
@@ -401,10 +410,10 @@
             item.UserId = user.Id;
 
             await GS.AddUserBinaryGraph(item);
-
             await GetBinaryReadings();
             BinaryGraphs.Add(item);
             await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
         }
     }
 
@@ -422,6 +431,7 @@
 
     private async Task RemoveDistanceReadings()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -442,12 +452,14 @@
             {
                 DistanceReadings = DistanceReadings.Where(dr => dr.SensorName != item).ToList();
             }
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveLuminosityReadings()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -468,12 +480,14 @@
             {
                 LuminosityReadings = LuminosityReadings.Where(lr => lr.SensorName != item).ToList();
             }
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveTemperatureReadings()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -494,12 +508,14 @@
             {
                 TemperatureReadings = TemperatureReadings.Where(tr => tr.SensorName != item).ToList();
             }
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveVelocityReadings()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -520,12 +536,14 @@
             {
                 VelocityReadings = VelocityReadings.Where(vr => vr.SensorName != item).ToList();
             }
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveHumidityReadings()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -546,42 +564,53 @@
             {
                 HumidityReadings = HumidityReadings.Where(hr => hr.SensorName != item).ToList();
             }
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveGraph(string id)
     {
+        timer.Enabled = false;
         var result = await GS.DeleteGraph(id);
 
         if (result)
         {
             Graphs.Remove(Graphs.Find(g => g.Id == id));
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveTable(string id)
     {
+        timer.Enabled = false;
         var result = await GS.DeleteTable(id);
 
         if (result)
         {
             Tables.Remove(Tables.Find(g => g.Id == id));
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async Task RemoveBinaryGraph(string id)
     {
+        timer.Enabled = false;
         var result = await GS.DeleteBinaryGraph(id);
 
         if (result)
         {
             BinaryGraphs.Remove(BinaryGraphs.Find(bg => bg.Id == id));
+            await InvokeAsync(StateHasChanged);
         }
+        timer.Enabled = true;
     }
 
     private async void SetupEmailNotification()
     {
+        timer.Enabled = false;
         EmailNotification emailNotification = new() { UserId = user.Id };
 
         var dialog = await DialogService.ShowDialogAsync<SetEmailNotificationDialog>(emailNotification, new DialogParameters()
@@ -631,10 +660,12 @@
                     });
             }
         }
+        timer.Enabled = true;
     }
 
     private async void OpenEmailNotificationsDialog()
     {
+        timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<EmailNotificationsDialog>(EmailNotifications, new DialogParameters()
             {
                 Height = "600px",
@@ -650,6 +681,7 @@
         if (result.Data != null) notificationsList = (List<EmailNotification>)result.Data;
 
         if (notificationsList.Count < 1) await InvokeAsync(StateHasChanged);
+        timer.Enabled = true;
     }
 
     async Task CopyToClipboard()
