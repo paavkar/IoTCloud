@@ -27,7 +27,7 @@
         <FluentAccordion Style="margin-left: 1em; width: 40%;">
             <FluentAccordionItem Style="background-color: green;" Heading="Your API key">
                 @ApiKey
-                <FluentIcon Id="apiKeyTooltipIcon" OnClick="CopyToClipboard" Style="cursor: pointer;" Icon="Icons.Regular.Size20.Copy" />
+                <FluentIcon Id="apiKeyTooltipIcon" OnClick="CopyToClipboard" Style="cursor: pointer;" Icon="Icons.Regular.Size20.Clipboard" />
                 <FluentTooltip Anchor="apiKeyTooltipIcon">Click to copy API key.</FluentTooltip>
             </FluentAccordionItem>
         </FluentAccordion>
@@ -59,7 +59,7 @@
                 }
             }
         </FluentStack>
-        <FluentDataGrid Items="@Sensors.AsQueryable()">
+        <FluentDataGrid Items="@Sensors.AsQueryable()" Pagination="Pagination">
             <PropertyColumn Title="Sensor name" Property="@(s => s.Name)" Sortable="true" />
             <PropertyColumn Title="Sensor creation time" Property="@(s => s.CreatedAt)" Sortable="true" />
             <PropertyColumn Title="Sensor modification time" Property="@(s => s.ModifiedAt)" Sortable="true" />
@@ -68,6 +68,7 @@
                 <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(e => DeleteSensor(context.Id))" />
             </TemplateColumn>
         </FluentDataGrid>
+        <FluentPaginator  State="@Pagination" />
     }
     else
     {
@@ -77,6 +78,8 @@
 
 @code {
     private ApplicationUser user = default!;
+
+    PaginationState Pagination = new PaginationState { ItemsPerPage = 10 };
 
     private string? ApiKey { get; set; }
 

@@ -21,6 +21,7 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
         <FluentSelect Items=@dataTypeOptions
                       OptionText="@(i => i.Text)"
                       OptionValue="@(i => i.Value)"
@@ -66,9 +67,11 @@
         { new Option<string> { Value = "VelocityReading", Text = "Velocity" }},
         { new Option<string> { Value = "HumidityReading", Text = "Humidity" }}
     }; 
-    
+
     private List<Sensor> Sensors { get; set; } = new();
     private ApplicationUser user = default!;
+
+    string Message = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {
@@ -78,6 +81,13 @@
 
     private async Task SaveAsync()
     {
+
+        if (string.IsNullOrEmpty(Content.SensorName))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+        Message = string.Empty;
         await Dialog.CloseAsync(Content);
     }
 

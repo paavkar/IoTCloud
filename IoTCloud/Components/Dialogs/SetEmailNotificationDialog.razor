@@ -21,7 +21,7 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack>
-            <FluentLabel Color="Color.Error">@Message</FluentLabel>
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
         <FluentStack Orientation="Orientation.Vertical">
             <FluentRadioGroup @bind-Value=Notification.ReadingType Label="Reading type of the data">
                 @foreach (ReadingType item in Enum.GetValues<ReadingType>())
@@ -48,7 +48,17 @@
                 <FluentTextField Id="nonAccount" TextFieldType="TextFieldType.Email" @bind-Value=Notification.Email Label="Email" Style="width: 90%;" Required="true" />
             }
 
-            <FluentTextField @bind-Value="@Notification.SensorName" Style="width: 90%;">What sensor should this notification be for?</FluentTextField>
+            <FluentSelect TOption="string"
+                          @bind-Value="Notification.SensorName"
+                          Label="What sensor should this graph be for?">
+                <FluentOption Value="">Select an item...</FluentOption>
+                @foreach (var sensor in Sensors)
+                {
+                    <FluentOption Value=@sensor.Name Selected>@sensor.Name</FluentOption>
+                }
+            </FluentSelect>
+
+            @* <FluentTextField @bind-Value="@Notification.SensorName" Style="width: 90%;">What sensor should this notification be for?</FluentTextField> *@
         </FluentStack>
 
         <FluentStack Orientation="Orientation.Vertical">
@@ -113,6 +123,12 @@
             Message = "Add an email before continuing";
             return;
         }
+        if (string.IsNullOrEmpty(Notification.SensorName))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+
         Message = string.Empty;
         Content.Email = Notification.Email;
         Content.NotificationMessage = Notification.NotificationMessage;

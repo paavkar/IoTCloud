@@ -21,8 +21,8 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentStack>
-
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
         <FluentSelect TOption="string"
                       @bind-Value="Content"
                       Label="What sensor should this graph be for?">
@@ -47,6 +47,8 @@
     private List<Sensor> Sensors { get; set; } = new();
     private ApplicationUser user = default!;
 
+    string Message = string.Empty;
+
     protected async override Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync();
@@ -55,6 +57,12 @@
 
     private async Task SaveAsync()
     {
+        if (string.IsNullOrEmpty(Content))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+        Message = string.Empty;
         await Dialog.CloseAsync(Content);
     }
 

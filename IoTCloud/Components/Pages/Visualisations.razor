@@ -127,12 +127,13 @@
                     else
                     {
                         <FluentStack>
-                            <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).AsQueryable()">
+                            <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).AsQueryable()" Pagination="Pagination">
                                 <PropertyColumn Title="Binary" Property="@(b => b.Binary)" Sortable="true" />
                                 <PropertyColumn Title="Reading type" Property="@(b => b.ReadingType)" Sortable="true" />
                                 <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
                                 <PropertyColumn Title="Sensor name" Property="@(b => b.SensorName)" Sortable="true" />
                             </FluentDataGrid>
+                            <FluentPaginator State="@Pagination" />
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
                         </FluentStack>
                     }
@@ -177,6 +178,8 @@ else
 
 @code {
     private ApplicationUser user = default!;
+
+    PaginationState Pagination = new PaginationState { ItemsPerPage = 10 };
 
     private string? ApiKey { get; set; }
 

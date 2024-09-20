@@ -21,6 +21,7 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
         <FluentRadioGroup @bind-Value=Content.ReadingType Label="Reading type of the data">
             @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
@@ -62,6 +63,8 @@
     private List<Sensor> Sensors { get; set; } = new();
     private ApplicationUser user = default!;
 
+    string Message = string.Empty;
+
     protected async override Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync();
@@ -70,6 +73,12 @@
 
     private async Task SaveAsync()
     {
+        if (string.IsNullOrEmpty(Content.SensorName))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+        Message = string.Empty;
         await Dialog.CloseAsync(Content);
     }
 
