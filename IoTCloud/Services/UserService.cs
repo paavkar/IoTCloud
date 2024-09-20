@@ -24,15 +24,39 @@ namespace IoTCloud.Services
 
         public async Task<bool> DeleteUserApiKeyAsync(string apiKey)
         {
-            using var connection = GetConnection();
-            var sql = @"
-                        DELETE ak
-                        FROM ApiKeys ak
-                        WHERE ak.ApiKeyId = @ApiKey";
+            using (var connection = GetConnection())
+            {
+                connection.Open();
 
-            var affected = await connection.ExecuteAsync(sql, new { ApiKey = apiKey });
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        var removeSensorsSql = @"
+                                   DELETE s
+                                   FROM Sensors s
+                                   WHERE s.ApiKey = @ApiKey";
 
-            return affected > 0;
+                        var affectedRows = await connection.ExecuteAsync(removeSensorsSql, new { ApiKey = apiKey }, transaction);
+
+                        var sql = @"
+                                DELETE ak
+                                FROM ApiKeys ak
+                                WHERE ak.ApiKeyId = @ApiKey";
+
+                        var affected = await connection.ExecuteAsync(sql, new { ApiKey = apiKey }, transaction);
+
+                        transaction.Commit();
+
+                        return affected > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+            }
         }
 
         public async Task<string?> GetUserApiKey(string userId)

@@ -1,5 +1,6 @@
 ﻿@implements IDialogContentComponent<EmailNotification>
 @inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
 
 @* Header *@
 <FluentDialogHeader>
@@ -84,6 +85,7 @@
     [Parameter]
     public EmailNotification Content { get; set; } = default!;
     public EmailNotification Notification { get; set; } = new();
+    private List<Sensor> Sensors { get; set; } = new();
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
@@ -91,6 +93,8 @@
     protected override async Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync();
+        Sensors = await SensorsService.GetSensors(user.Id);
+
         if (Content.Email == user.Email) EmailToUse = 1;
 
         Notification.Email = Content.Email;

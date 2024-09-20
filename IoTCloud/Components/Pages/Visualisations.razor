@@ -1,0 +1,598 @@
+﻿@page "/visualisations"
+@using System.Timers
+@rendermode InteractiveServer
+
+@implements IDisposable
+
+@inject IdentityUserAccessor UserAccessor
+@inject NavigationManager NavigationManager
+@inject ClipboardService ClipboardService
+@inject IUserService UserService
+@inject IDialogService DialogService
+@inject IReadingsService RS
+@inject IGraphsService GS
+@inject IToastService ToastService
+@inject ISensorsService SensorsService
+
+@attribute [Authorize]
+
+<PageTitle>Data visualisations</PageTitle>
+
+<FluentLabel Typo="Typography.H3">Data visualisations</FluentLabel>
+
+@if (!string.IsNullOrEmpty(ApiKey))
+{
+    @if (Sensors.Any())
+    {
+        <FluentStack Style="margin-top: 1em;" Orientation="Orientation.Vertical">
+            <FluentStack>
+                <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddGraph">Add data graph</FluentButton>
+                <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddTable">Add data table</FluentButton>
+                <FluentButton BackgroundColor="green" Color="white" Appearance="Appearance.Accent" OnClick="AddBinaryGraph">Add binary graph</FluentButton>
+            </FluentStack>
+            <FluentStack>
+                @if (DistanceReadings.Any())
+                {
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveDistanceReadings">Remove Distance Readings</FluentButton>
+                }
+                @if (LuminosityReadings.Any())
+                {
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveLuminosityReadings">Remove Luminosity Readings</FluentButton>
+                }
+                @if (TemperatureReadings.Any())
+                {
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveTemperatureReadings">Remove Temperature Readings</FluentButton>
+                }
+                @if (VelocityReadings.Any())
+                {
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveVelocityReadings">Remove Velocity Readings</FluentButton>
+                }
+                @if (HumidityReadings.Any())
+                {
+                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="RemoveHumidityReadings">Remove Humidity Readings</FluentButton>
+                }
+            </FluentStack>
+        </FluentStack>
+
+        <FluentDivider Style="margin-top: 1em; margin-bottom: 1em;" />
+
+        <FluentStack Orientation="Orientation.Vertical">
+            <Charts Graphs="Graphs"
+                    DistanceReadings="DistanceReadings"
+                    LuminosityReadings="LuminosityReadings"
+                    TemperatureReadings="TemperatureReadings"
+                    VelocityReadings="VelocityReadings"
+                    HumidityReadings="HumidityReadings"
+                    OnRemoveGraph="RemoveGraph" />
+
+            <FluentStack Orientation="Orientation.Vertical">
+                @foreach (var table in Tables)
+                {
+                    if (!table.IsBinary)
+                    {
+                        switch (table.ReadingType)
+                        {
+                            case ReadingType.Distance:
+                                <FluentStack>
+                                    <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).AsQueryable()">
+                                        <PropertyColumn Title="Distance" Property="@(t => t.Distance)" Sortable="true" />
+                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                                    </FluentDataGrid>
+                                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                                </FluentStack>
+                                break;
+                            case ReadingType.Luminosity:
+                                <FluentStack>
+                                    <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).AsQueryable()">
+                                        <PropertyColumn Title="Luminosity" Property="@(t => t.Luminosity)" Sortable="true" />
+                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                                    </FluentDataGrid>
+                                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                                </FluentStack>
+                                break;
+                            case ReadingType.Temperature:
+                                <FluentStack>
+                                    <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).AsQueryable()">
+                                        <PropertyColumn Title="Temperature" Property="@(t => t.Temperature)" Sortable="true" />
+                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                                    </FluentDataGrid>
+                                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                                </FluentStack>
+                                break;
+                            case ReadingType.Velocity:
+                                <FluentStack>
+                                    <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).AsQueryable()">
+                                        <PropertyColumn Title="Velocity" Property="@(t => t.Velocity)" Sortable="true" />
+                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                                    </FluentDataGrid>
+                                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                                </FluentStack>
+                                break;
+                            case ReadingType.Humidity:
+                                <FluentStack>
+                                    <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).AsQueryable()">
+                                        <PropertyColumn Title="Humidity" Property="@(t => t.Humidity)" Sortable="true" />
+                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
+                                    </FluentDataGrid>
+                                    <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                                </FluentStack>
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        <FluentStack>
+                            <FluentDataGrid Items="@BinaryReadings.Where(br => br.SensorName == table.SensorName).AsQueryable()">
+                                <PropertyColumn Title="Binary" Property="@(b => b.Binary)" Sortable="true" />
+                                <PropertyColumn Title="Reading type" Property="@(b => b.ReadingType)" Sortable="true" />
+                                <PropertyColumn Title="Time of measurement" Property="@(b => b.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                <PropertyColumn Title="Sensor name" Property="@(b => b.SensorName)" Sortable="true" />
+                            </FluentDataGrid>
+                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
+                        </FluentStack>
+                    }
+                }
+                @foreach (var graph in BinaryGraphs)
+                {
+                    if (BinaryReadings.Count > 0@*  && new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.Count > 0 *@)
+                    {
+                        BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.First();
+                        <FluentStack Style="margin-top: 1em;">
+                            @if (item.Binary == 1)
+                            {
+                                <span style="height: 250px; width: 250px; background-color: red; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
+                            }
+                            else if (item.Binary == 0)
+                            {
+                                <span style="height: 250px; width: 250px; background-color: green; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
+                            }
+                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
+                        </FluentStack>
+                    }
+                    else
+                    {
+                        <FluentStack Style="margin-top: 1em;">
+                            <span style="height: 250px; width: 250px; background-color: grey; border-radius: 50%; display: inline-block;"></span>
+                            <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
+                        </FluentStack>
+                    }
+                }
+            </FluentStack>
+        </FluentStack>
+    }
+    else
+    {
+        <FluentLabel Style="margin-top: 1em;" Typo="Typography.H5" Weight="FontWeight.Bold">Add a sensor in the dashboard before continuing</FluentLabel>
+    }
+}
+else
+{
+    <FluentLabel Style="margin-top: 1em;" Typo="Typography.H5" Weight="FontWeight.Bold">Create an API Key first.</FluentLabel>
+}
+
+@code {
+    private ApplicationUser user = default!;
+
+    private string? ApiKey { get; set; }
+
+    CancellationTokenSource cts = new();
+
+    private List<Sensor> Sensors { get; set; } = new();
+    private List<GraphItem> Graphs { get; set; } = new();
+    private List<TableItem> Tables { get; set; } = new();
+    private List<BinaryGraphItem> BinaryGraphs { get; set; } = new();
+    private List<DistanceReading> DistanceReadings { get; set; } = new();
+    private List<LuminosityReading> LuminosityReadings { get; set; } = new();
+    private List<TemperatureReading> TemperatureReadings { get; set; } = new();
+    private List<VelocityReading> VelocityReadings { get; set; } = new();
+    private List<BinaryReading> BinaryReadings { get; set; } = new();
+    private List<HumidityReading> HumidityReadings { get; set; } = new();
+
+    private System.Timers.Timer timer = new(15000);
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        ApiKey = await UserService.GetUserApiKey(user.Id);
+
+        Sensors = await SensorsService.GetSensors(user.Id);
+
+        Graphs = await GS.GetUserGraphs(user.Id);
+        Tables = await GS.GetUserTables(user.Id);
+        BinaryGraphs = await GS.GetUserBinaryGraphItems(user.Id);
+
+        if (Graphs.Count > 0)
+        {
+            foreach (var graph in Graphs)
+            {
+                await GetReadings(graph);
+            }
+        }
+        if (Tables.Count > 0)
+        {
+            foreach (var table in Tables)
+            {
+                await GetReadings(table);
+            }
+        }
+        if (BinaryGraphs.Count > 0)
+        {
+            foreach (var graph in BinaryGraphs)
+            {
+                await GetBinaryReadings();
+            }
+        }
+
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    private async void OnTimedEvent(object source, ElapsedEventArgs e)
+    {
+        if (Graphs.Count > 0)
+        {
+            foreach (var graph in Graphs)
+            {
+                await GetReadings(graph);
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        else if (Tables.Count > 0)
+        {
+            foreach (var table in Tables)
+            {
+                await GetReadings(table);
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        if (BinaryGraphs.Count > 0)
+        {
+            foreach (var graph in BinaryGraphs)
+            {
+                await GetBinaryReadings();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task GetReadings(GraphItem item)
+    {
+        switch (item.DataType)
+        {
+            case "DistanceReading":
+                DistanceReadings = await RS.GetDistanceReadings(user.Id);
+                break;
+            case "LuminosityReading":
+                LuminosityReadings = await RS.GetLuminosityReadings(user.Id);
+                break;
+            case "TemperatureReading":
+                TemperatureReadings = await RS.GetTemperatureReadings(user.Id);
+                break;
+            case "VelocityReading":
+                VelocityReadings = await RS.GetVelocityReadings(user.Id);
+                break;
+            case "HumidityReading":
+                HumidityReadings = await RS.GetHumidityReadings(user.Id);
+                break;
+        }
+    }
+
+    private async Task GetReadings(TableItem tableItem)
+    {
+        switch (tableItem.ReadingType)
+        {
+            case ReadingType.Distance:
+                DistanceReadings = await RS.GetDistanceReadings(user.Id);
+                break;
+            case ReadingType.Luminosity:
+                LuminosityReadings = await RS.GetLuminosityReadings(user.Id);
+                break;
+            case ReadingType.Temperature:
+                TemperatureReadings = await RS.GetTemperatureReadings(user.Id);
+                break;
+            case ReadingType.Velocity:
+                VelocityReadings = await RS.GetVelocityReadings(user.Id);
+                break;
+            case ReadingType.Humidity:
+                HumidityReadings = await RS.GetHumidityReadings(user.Id);
+                break;
+        }
+    }
+
+    private async Task GetBinaryReadings()
+    {
+        BinaryReadings = await RS.GetBinaryReadings(user.Id);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async void CreateApiKey()
+    {
+        var key = await UserService.SetUserApiKey(user.Id);
+
+        ApiKey = key.ApiKeyId;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async void AddGraph()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Add a new data graph",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            GraphItem item = (GraphItem)result.Data;
+
+            item.UserId = user.Id;
+
+            await GS.AddUserGraph(item);
+
+            await GetReadings(item);
+            Graphs.Add(item);
+            await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
+        }
+    }
+
+    public async void AddTable()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<TableDialog>(new TableItem(), new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Add a new data table",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            TableItem item = (TableItem)result.Data;
+
+            item.UserId = user.Id;
+
+            await GS.AddUserTable(item);
+
+            await GetReadings(item);
+            Tables.Add(item);
+            await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
+        }
+    }
+
+    public async void AddBinaryGraph()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<AddBinaryGraphDialog>(new BinaryGraphItem(), new DialogParameters()
+            {
+                Height = "400px",
+                Title = $"Add a new binary graph",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            BinaryGraphItem item = (BinaryGraphItem)result.Data;
+
+            item.UserId = user.Id;
+
+            await GS.AddUserBinaryGraph(item);
+            await GetBinaryReadings();
+            BinaryGraphs.Add(item);
+            await InvokeAsync(StateHasChanged);
+            timer.Enabled = true;
+        }
+    }
+
+
+    private async Task RemoveDistanceReadings()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveDistanceReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                DistanceReadings = DistanceReadings.Where(dr => dr.SensorName != item).ToList();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveLuminosityReadings()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveLuminosityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                LuminosityReadings = LuminosityReadings.Where(lr => lr.SensorName != item).ToList();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveTemperatureReadings()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveTemperatureReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                TemperatureReadings = TemperatureReadings.Where(tr => tr.SensorName != item).ToList();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveVelocityReadings()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveVelocityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                VelocityReadings = VelocityReadings.Where(vr => vr.SensorName != item).ToList();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveHumidityReadings()
+    {
+        timer.Enabled = false;
+        var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
+            {
+                Height = "230px",
+                Title = $"Remove Distance data from sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            string item = (string)result.Data;
+
+            var deleteResult = await RS.RemoveHumidityReadings(user.Id, item);
+
+            if (deleteResult)
+            {
+                HumidityReadings = HumidityReadings.Where(hr => hr.SensorName != item).ToList();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveGraph(string id)
+    {
+        timer.Enabled = false;
+        var result = await GS.DeleteGraph(id);
+
+        if (result)
+        {
+            Graphs.Remove(Graphs.Find(g => g.Id == id));
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveTable(string id)
+    {
+        timer.Enabled = false;
+        var result = await GS.DeleteTable(id);
+
+        if (result)
+        {
+            Tables.Remove(Tables.Find(g => g.Id == id));
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    private async Task RemoveBinaryGraph(string id)
+    {
+        timer.Enabled = false;
+        var result = await GS.DeleteBinaryGraph(id);
+
+        if (result)
+        {
+            BinaryGraphs.Remove(BinaryGraphs.Find(bg => bg.Id == id));
+            await InvokeAsync(StateHasChanged);
+        }
+        timer.Enabled = true;
+    }
+
+    async Task CopyToClipboard()
+    {
+        await ClipboardService.WriteTextAsync(ApiKey!);
+        await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
+    }
+
+    public void Dispose()
+    {
+        cts.Cancel(); // Cancel Task.Delay
+        cts.Dispose();
+        timer?.Dispose();
+    }
+}

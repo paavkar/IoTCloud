@@ -1,4 +1,6 @@
 ﻿@implements IDialogContentComponent<GraphItem>
+@inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
 
 @* Header *@
 <FluentDialogHeader>
@@ -35,7 +37,17 @@
 
         <FluentTextField @bind-Value="@Content.Name">Graph title:</FluentTextField>
 
-        <FluentTextField @bind-Value="@Content.SensorName">What sensor should this graph be for?</FluentTextField>
+        <FluentSelect TOption="string"
+                      @bind-Value="Content.SensorName"
+                      Label="What sensor should this graph be for?">
+            <FluentOption Value="">Select an item...</FluentOption>
+            @foreach (var sensor in Sensors)
+            {
+                <FluentOption Value=@sensor.Name Selected>@sensor.Name</FluentOption>
+            }
+        </FluentSelect>
+
+        @* <FluentTextField @bind-Value="@Content.SensorName">What sensor should this graph be for?</FluentTextField> *@
     </FluentStack>
 </FluentDialogBody>
 
@@ -53,7 +65,16 @@
         { new Option<string> { Value = "TemperatureReading", Text = "Temperature" }},
         { new Option<string> { Value = "VelocityReading", Text = "Velocity" }},
         { new Option<string> { Value = "HumidityReading", Text = "Humidity" }}
-    };
+    }; 
+    
+    private List<Sensor> Sensors { get; set; } = new();
+    private ApplicationUser user = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        Sensors = await SensorsService.GetSensors(user.Id);
+    }
 
     private async Task SaveAsync()
     {

@@ -17,5 +17,6 @@ namespace IoTCloud.Data
         public DbSet<HumidityReading> HumidityReadings { get; set; }
         public DbSet<TableItem> TableItems { get; set; }
         public DbSet<BinaryGraphItem> BinaryGraphItems { get; set; }
+        public DbSet<Sensor> Sensors { get; set; }
     }
 }

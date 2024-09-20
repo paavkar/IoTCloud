@@ -1,4 +1,7 @@
 ﻿@implements IDialogContentComponent<string>
+@inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
+
 
 @* Header *@
 <FluentDialogHeader>
@@ -19,7 +22,18 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack>
-       <FluentTextField Label="Sensor to remove the readings from" @bind-Value=Content />
+
+        <FluentSelect TOption="string"
+                      @bind-Value="Content"
+                      Label="What sensor should this graph be for?">
+            <FluentOption Value="">Select an item...</FluentOption>
+            @foreach (var sensor in Sensors)
+            {
+                <FluentOption Value=@sensor.Name Selected>@sensor.Name</FluentOption>
+            }
+        </FluentSelect>
+
+       @* <FluentTextField Label="Sensor to remove the readings from" @bind-Value=Content /> *@
     </FluentStack>
 </FluentDialogBody>
 
@@ -29,6 +43,15 @@
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
+
+    private List<Sensor> Sensors { get; set; } = new();
+    private ApplicationUser user = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        Sensors = await SensorsService.GetSensors(user.Id);
+    }
 
     private async Task SaveAsync()
     {

@@ -14,6 +14,7 @@
             <AuthorizeView>
                 <Authorized>
                     <FluentNavLink Href="Dashboard">Dashboard</FluentNavLink>
+                    <FluentNavLink Href="visualisations">Data visualisations</FluentNavLink>
                     <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.Person())">@context.User.Identity?.Name</FluentNavLink>
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
