@@ -5,24 +5,28 @@
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 
-<FluentProfileMenu Initials="U"
+@if (User != null)
+{
+   <FluentProfileMenu Initials="@User.Email[0].ToString().ToUpper()"
                    OnFooterLinkClick="@(e => NavigationManager.NavigateTo("Account/Manage"))"
-                   PopoverStyle="min-width: 330px;">
+                   PopoverStyle="min-width: 330px;"
+                   >
         <HeaderTemplate>
             <FluentStack Style="display: flex; justify-content: space-between;">
                 <FluentLabel Typo="Typography.Header">Profile menu</FluentLabel>
                 <form action="Account/Logout" method="post">
                     <AntiforgeryToken />
                     <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                    <FluentButton IconStart="@(new Icons.Regular.Size20.SignOut())" Type="ButtonType.Submit">Logout</FluentButton>
+                    <FluentButton Appearance="Appearance.Accent" Color="white" BackgroundColor="green" IconStart="@(new Icons.Regular.Size20.SignOut())" Type="ButtonType.Submit">Logout</FluentButton>
                 </form>
             </FluentStack>
         </HeaderTemplate>
     <ChildContent>
-        @* <FluentIcon Value="@(new Icons.Regular.Size20.Person())" /> *@
         <FluentLabel>@User.Email</FluentLabel>
     </ChildContent>
-</FluentProfileMenu>
+</FluentProfileMenu> 
+}
+
 
 @code {
     private ApplicationUser User = default!;

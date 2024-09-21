@@ -12,6 +12,10 @@ body {
     display: none;
 }
 
+header {
+    --accent-fill-rest: green;
+}
+
 .main {
     min-height: calc(100dvh - 86px);
     color: var(--neutral-foreground-rest);
