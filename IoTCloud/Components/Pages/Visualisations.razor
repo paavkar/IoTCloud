@@ -233,12 +233,11 @@ else
 
         timer.Elapsed += OnTimedEvent;
         timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async void OnTimedEvent(object source, ElapsedEventArgs e)
     {
-        Console.WriteLine($"{e.SignalTime}");
         if (Graphs.Count > 0)
         {
             foreach (var graph in Graphs)
@@ -326,7 +325,7 @@ else
 
     public async void AddGraph()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
             {
                 Height = "500px",
@@ -348,18 +347,16 @@ else
             await GetReadings(item);
             Graphs.Add(item);
             await InvokeAsync(StateHasChanged);
-            timer.Elapsed += OnTimedEvent;
-            timer.AutoReset = true;
-            timer.Enabled = true;
         }
+        timer.Start();
     }
 
     public async void AddTable()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<TableDialog>(new TableItem(), new DialogParameters()
             {
-                Height = "400px",
+                Height = "500px",
                 Title = $"Add a new data table",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
@@ -378,15 +375,13 @@ else
             await GetReadings(item);
             Tables.Add(item);
             await InvokeAsync(StateHasChanged);
-            timer.Elapsed += OnTimedEvent;
-            timer.AutoReset = true;
-            timer.Enabled = true;
         }
+        timer.Start();
     }
 
     public async void AddBinaryGraph()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<AddBinaryGraphDialog>(new BinaryGraphItem(), new DialogParameters()
             {
                 Height = "400px",
@@ -407,15 +402,13 @@ else
             await GetBinaryReadings();
             BinaryGraphs.Add(item);
             await InvokeAsync(StateHasChanged);
-            timer.Elapsed += OnTimedEvent;
-            timer.AutoReset = true;
-            timer.Enabled = true;
         }
+        timer.Start();
     }
 
     private async Task RemoveDistanceReadings()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -438,14 +431,12 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveLuminosityReadings()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -468,14 +459,12 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveTemperatureReadings()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -498,14 +487,12 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveVelocityReadings()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -528,14 +515,12 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveHumidityReadings()
     {
-        timer.Enabled = false;
+        timer.Stop();
         var dialog = await DialogService.ShowDialogAsync<RemoveDataDialog>(string.Empty, new DialogParameters()
             {
                 Height = "230px",
@@ -558,14 +543,12 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveGraph(string id)
     {
-        timer.Enabled = false;
+        timer.Stop();
         var result = await GS.DeleteGraph(id);
 
         if (result)
@@ -573,14 +556,12 @@ else
             Graphs.Remove(Graphs.Find(g => g.Id == id));
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveTable(string id)
     {
-        timer.Enabled = false;
+        timer.Stop();
         var result = await GS.DeleteTable(id);
 
         if (result)
@@ -588,14 +569,12 @@ else
             Tables.Remove(Tables.Find(g => g.Id == id));
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     private async Task RemoveBinaryGraph(string id)
     {
-        timer.Enabled = false;
+        timer.Stop();
         var result = await GS.DeleteBinaryGraph(id);
 
         if (result)
@@ -603,9 +582,7 @@ else
             BinaryGraphs.Remove(BinaryGraphs.Find(bg => bg.Id == id));
             await InvokeAsync(StateHasChanged);
         }
-        timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
     }
 
     async Task CopyToClipboard()
