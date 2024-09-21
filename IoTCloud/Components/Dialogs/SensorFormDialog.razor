@@ -1,0 +1,69 @@
+﻿@implements IDialogContentComponent<Sensor>
+@inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
+
+@* Header *@
+<FluentDialogHeader>
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync" Disabled="@Disabled">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
+
+        <FluentRadioGroup Style="margin-top: 1em;" @bind-Value=Content.ReadingType Label="Reading type of the data">
+            @foreach (ReadingType item in Enum.GetValues<ReadingType>())
+            {
+                if (item != ReadingType.Binary)
+                {
+                    <FluentRadio Value="@item">@item</FluentRadio>
+                }
+            }
+        </FluentRadioGroup>
+
+        <FluentTextField Style="margin-top: 1em;" Label="Name for the sensor" @bind-Value=Content.Name />
+    </FluentStack>
+</FluentDialogBody>
+
+
+@code {
+    int? EmailToUse = 2;
+    bool Disabled = false;
+    string Message = string.Empty;
+    private ApplicationUser user = default!;
+    [Parameter]
+    public Sensor Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        var sensorAlreadyExists = await SensorsService.CheckSensorExists(Content.Name, user.Id);
+
+        if (!sensorAlreadyExists) await Dialog.CloseAsync(Content);
+        else Message = $"You already have a sensor with the name {Content.Name}. Choose a different name.";
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+}

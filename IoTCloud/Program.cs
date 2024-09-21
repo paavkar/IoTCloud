@@ -27,6 +27,7 @@ builder.Services.AddScoped<IReadingsService, ReadingsService>();
 builder.Services.AddScoped<ClipboardService>();
 builder.Services.AddScoped<ITooltipService, TooltipService>();
 builder.Services.AddScoped<IGraphsService, GraphsService>();
+builder.Services.AddScoped<ISensorsService, SensorsService>();
 
 builder.Services.AddAuthentication(options =>
     {

@@ -1,4 +1,7 @@
 ﻿@implements IDialogContentComponent<string>
+@inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
+
 
 @* Header *@
 <FluentDialogHeader>
@@ -18,8 +21,19 @@
 
 @* Body *@
 <FluentDialogBody>
-    <FluentStack>
-       <FluentTextField Label="Sensor to remove the readings from" @bind-Value=Content />
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
+        <FluentSelect TOption="string"
+                      @bind-Value="Content"
+                      Label="What sensor should this graph be for?">
+            <FluentOption Value="">Select an item...</FluentOption>
+            @foreach (var sensor in Sensors)
+            {
+                <FluentOption Value=@sensor.Name Selected>@sensor.Name</FluentOption>
+            }
+        </FluentSelect>
+
+       @* <FluentTextField Label="Sensor to remove the readings from" @bind-Value=Content /> *@
     </FluentStack>
 </FluentDialogBody>
 
@@ -30,8 +44,25 @@
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
 
+    private List<Sensor> Sensors { get; set; } = new();
+    private ApplicationUser user = default!;
+
+    string Message = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        Sensors = await SensorsService.GetSensors(user.Id);
+    }
+
     private async Task SaveAsync()
     {
+        if (string.IsNullOrEmpty(Content))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+        Message = string.Empty;
         await Dialog.CloseAsync(Content);
     }
 

@@ -1,4 +1,5 @@
 ﻿using IoTCloud.Models;
+using Microsoft.Data.SqlClient;
 
 namespace IoTCloud.Services
 {
@@ -18,5 +19,7 @@ namespace IoTCloud.Services
         Task<List<BinaryGraphItem>> GetUserBinaryGraphItems(string userId);
         Task<bool> DeleteUserBinaryGraphs(string userId);
         Task<bool> DeleteBinaryGraph(string id);
+
+        Task DeleteGraphsBySensor(string sensorName, string userId, SqlConnection connection, SqlTransaction transaction, bool deleteBySensor = false);
     }
 }

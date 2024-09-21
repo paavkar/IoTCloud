@@ -7,7 +7,7 @@ namespace IoTCloud.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DistanceController(IReadingsService readingsService, IUserService userService) : ControllerBase
+    public class DistanceController(IReadingsService readingsService, IUserService userService, ISensorsService sensorsService) : ControllerBase
     {
         [HttpGet("add")]
         public async Task<IActionResult> AddReading(string apiKey, string sensorName, float distance)
@@ -17,6 +17,10 @@ namespace IoTCloud.Controllers
             var existingKey = await userService.CheckApiKeyExistsAsync(apiKey);
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
+
+            var sensorExists = await sensorsService.CheckSensorExists(sensorName, existingKey.UserId);
+
+            if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
             var isOperationSuccessful = await readingsService.AddDistanceReading(distance, sensorName, existingKey.UserId, DateTimeOffset.Now);
 
@@ -37,6 +41,10 @@ namespace IoTCloud.Controllers
             var existingKey = await userService.CheckApiKeyExistsAsync(apiKey);
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
+
+            var sensorExists = await sensorsService.CheckSensorExists(sensorName, existingKey.UserId);
+
+            if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
             var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName, existingKey.UserId, DateTimeOffset.Now, ReadingType.Distance);
 

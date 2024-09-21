@@ -1,4 +1,6 @@
 ﻿@implements IDialogContentComponent<TableItem>
+@inject IdentityUserAccessor UserAccessor
+@inject ISensorsService SensorsService
 
 @* Header *@
 <FluentDialogHeader>
@@ -19,6 +21,7 @@
 @* Body *@
 <FluentDialogBody>
     <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Color="Color.Error">@Message</FluentLabel>
         <FluentRadioGroup @bind-Value=Content.ReadingType Label="Reading type of the data">
             @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
@@ -36,7 +39,17 @@
 
         <FluentTextField @bind-Value="@Content.Name">Table title:</FluentTextField>
 
-        <FluentTextField @bind-Value="@Content.SensorName">What sensor should this table be for?</FluentTextField>
+        <FluentSelect TOption="string"
+                      @bind-Value="Content.SensorName"
+                      Label="What sensor should this graph be for?">
+            <FluentOption Value="">Select an item...</FluentOption>
+            @foreach (var sensor in Sensors)
+            {
+                <FluentOption Value=@sensor.Name Selected>@sensor.Name</FluentOption>
+            }
+        </FluentSelect>
+
+        @* <FluentTextField @bind-Value="@Content.SensorName">What sensor should this table be for?</FluentTextField> *@
     </FluentStack>
 </FluentDialogBody>
 
@@ -47,8 +60,25 @@
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
 
+    private List<Sensor> Sensors { get; set; } = new();
+    private ApplicationUser user = default!;
+
+    string Message = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync();
+        Sensors = await SensorsService.GetSensors(user.Id);
+    }
+
     private async Task SaveAsync()
     {
+        if (string.IsNullOrEmpty(Content.SensorName))
+        {
+            Message = "Choose your sensor name";
+            return;
+        }
+        Message = string.Empty;
         await Dialog.CloseAsync(Content);
     }
 
