@@ -1,16 +1,13 @@
 ﻿@rendermode InteractiveServer
 
 @implements IDisposable
-
-@inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 
-@if (User != null)
+@if (!string.IsNullOrEmpty(UserEmail))
 {
-   <FluentProfileMenu Initials="@User.Email[0].ToString().ToUpper()"
+    <FluentProfileMenu Initials="@UserEmail[0].ToString().ToUpper()"
                    OnFooterLinkClick="@(e => NavigationManager.NavigateTo("Account/Manage"))"
-                   PopoverStyle="min-width: 330px;"
-                   >
+                   PopoverStyle="min-width: 330px;">
         <HeaderTemplate>
             <FluentStack Style="display: flex; justify-content: space-between;">
                 <FluentLabel Typo="Typography.Header">Profile menu</FluentLabel>
@@ -22,19 +19,19 @@
             </FluentStack>
         </HeaderTemplate>
     <ChildContent>
-        <FluentLabel>@User.Email</FluentLabel>
+            <FluentLabel>@UserEmail</FluentLabel>
     </ChildContent>
 </FluentProfileMenu> 
 }
 
 
 @code {
-    private ApplicationUser User = default!;
+    [Parameter]
+    public string UserEmail { get; set; } = default!;
     private string? currentUrl;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        User = await UserAccessor.GetRequiredUserAsync();
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }

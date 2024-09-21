@@ -198,44 +198,86 @@ namespace IoTCloud.Services
 
         public async Task<List<DistanceReading>> GetDistanceReadings(string userId)
         {
-            var readings = await context.DistanceReadings.Where(tr => tr.UserId == userId).OrderByDescending(dr => dr.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var readings = await context.DistanceReadings.Where(tr => tr.UserId == userId).OrderByDescending(dr => dr.TimeOfMeasurement).ToListAsync();
 
-            return readings;
+                return readings;
+            }
+            catch (Exception)
+            {
+                return new List<DistanceReading>();
+            }
         }
 
         public async Task<List<LuminosityReading>> GetLuminosityReadings(string userId)
         {
-            var readings = await context.LuminosityReadings.Where(lr => lr.UserId == userId).OrderByDescending(lr => lr.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var readings = await context.LuminosityReadings.Where(lr => lr.UserId == userId).OrderByDescending(lr => lr.TimeOfMeasurement).ToListAsync();
 
-            return readings;
+                return readings;
+            }
+            catch (Exception)
+            {
+                return new List<LuminosityReading>();
+            }
         }
 
         public async Task<List<TemperatureReading>> GetTemperatureReadings(string userId)
         {
-            var readings = await context.TemperatureReadings.Where(tr => tr.UserId == userId).OrderByDescending(tr => tr.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var readings = await context.TemperatureReadings.Where(tr => tr.UserId == userId).OrderByDescending(tr => tr.TimeOfMeasurement).ToListAsync();
 
-            return readings;
+                return readings;
+            }
+            catch (Exception)
+            {
+                return new List<TemperatureReading>();
+            }
         }
 
         public async Task<List<VelocityReading>> GetVelocityReadings(string userId)
         {
-            var readings = await context.VelocityReadings.Where(vr => vr.UserId == userId).OrderByDescending(vr => vr.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var readings = await context.VelocityReadings.Where(vr => vr.UserId == userId).OrderByDescending(vr => vr.TimeOfMeasurement).ToListAsync();
 
-            return readings;
+                return readings;
+            }
+            catch (Exception)
+            {
+                return new List<VelocityReading>();
+            }
         }
 
         public async Task<List<BinaryReading>> GetBinaryReadings(string userId)
         {
-            var binaryReadings = await context.BinaryReadings.Where(br => br.UserId == userId).OrderByDescending(br => br.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var binaryReadings = await context.BinaryReadings.Where(br => br.UserId == userId).OrderByDescending(br => br.TimeOfMeasurement).ToListAsync();
 
-            return binaryReadings;
+                return binaryReadings;
+            }
+            catch (Exception)
+            {
+                return new List<BinaryReading>();
+            }
         }
 
         public async Task<List<HumidityReading>> GetHumidityReadings(string userId)
         {
-            var readings = await context.HumidityReadings.Where(hr => hr.UserId == userId).OrderByDescending(hr => hr.TimeOfMeasurement).ToListAsync();
+            try
+            {
+                var readings = await context.HumidityReadings.Where(hr => hr.UserId == userId).OrderByDescending(hr => hr.TimeOfMeasurement).ToListAsync();
 
-            return readings;
+                return readings;
+            }
+            catch (Exception)
+            {
+                return new List<HumidityReading>();
+            }
         }
 
         public async Task<bool> RemoveDistanceReadings(string userId, string sensorName)

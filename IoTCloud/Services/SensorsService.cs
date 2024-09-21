@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IoTCloud.Services
 {
-    public class SensorsService(ApplicationDbContext context, IConfiguration configuration) : ISensorsService
+    public class SensorsService(ApplicationDbContext context, IConfiguration configuration, IGraphsService graphsService, IUserService userService) : ISensorsService
     {
         private SqlConnection GetConnection()
         {
@@ -28,24 +28,54 @@ namespace IoTCloud.Services
 
         public async Task<bool> CheckSensorExists(string sensorName, string userId)
         {
-            var existingSensor = await context.Sensors.FirstOrDefaultAsync(s => s.Name == sensorName && s.UserId == userId);
+            try
+            {
+                var existingSensor = await context.Sensors.FirstOrDefaultAsync(s => s.Name == sensorName && s.UserId == userId);
 
-            if (existingSensor != null) return true;
-            return false;
+                if (existingSensor != null) return true;
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        public async Task<bool> DeleteSensor(string id, string sensorName)
+        public async Task<bool> DeleteSensor(string id, string sensorName, string userId)
         {
-            using var connection = GetConnection();
+            using (var connection = GetConnection())
+            {
+                connection.Open();
 
-            var sql = @"
-                        DELETE s
-                        FROM Sensors s
-                        WHERE s.Id = @Id";
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        await userService.DeleteReadingsBySensor(sensorName, userId, connection, transaction, true);
 
-            var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
+                        await graphsService.DeleteGraphsBySensor(sensorName, userId, connection, transaction, true);
 
-            return rowsAffected > 0;
+                        await userService.DeleteNotificationsBySensor(sensorName, userId, connection, transaction, true);
+
+                        var sql = @"
+                                  DELETE s
+                                  FROM Sensors s
+                                  WHERE s.Id = @Id";
+
+                        var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id }, transaction);
+
+                        transaction.Commit();
+
+                        return rowsAffected > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+            }
         }
 
         public async Task<List<Sensor>> GetSensors(string userId)

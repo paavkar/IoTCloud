@@ -238,6 +238,7 @@ else
 
     private async void OnTimedEvent(object source, ElapsedEventArgs e)
     {
+        Console.WriteLine($"{e.SignalTime}");
         if (Graphs.Count > 0)
         {
             foreach (var graph in Graphs)
@@ -328,7 +329,7 @@ else
         timer.Enabled = false;
         var dialog = await DialogService.ShowDialogAsync<DataGraphDialog>(new GraphItem(), new DialogParameters()
             {
-                Height = "400px",
+                Height = "500px",
                 Title = $"Add a new data graph",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true,
@@ -347,6 +348,8 @@ else
             await GetReadings(item);
             Graphs.Add(item);
             await InvokeAsync(StateHasChanged);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
             timer.Enabled = true;
         }
     }
@@ -375,6 +378,8 @@ else
             await GetReadings(item);
             Tables.Add(item);
             await InvokeAsync(StateHasChanged);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
             timer.Enabled = true;
         }
     }
@@ -402,10 +407,11 @@ else
             await GetBinaryReadings();
             BinaryGraphs.Add(item);
             await InvokeAsync(StateHasChanged);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
             timer.Enabled = true;
         }
     }
-
 
     private async Task RemoveDistanceReadings()
     {
@@ -432,6 +438,8 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -460,6 +468,8 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -488,6 +498,8 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -516,6 +528,8 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -544,6 +558,8 @@ else
             }
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -557,6 +573,8 @@ else
             Graphs.Remove(Graphs.Find(g => g.Id == id));
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -570,6 +588,8 @@ else
             Tables.Remove(Tables.Find(g => g.Id == id));
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 
@@ -583,6 +603,8 @@ else
             BinaryGraphs.Remove(BinaryGraphs.Find(bg => bg.Id == id));
             await InvokeAsync(StateHasChanged);
         }
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
         timer.Enabled = true;
     }
 

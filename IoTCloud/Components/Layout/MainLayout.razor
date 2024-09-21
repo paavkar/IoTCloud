@@ -7,7 +7,7 @@
         <FluentSpacer />
         <AuthorizeView>
             <Authorized>
-                <UserProfileMenu />
+                <UserProfileMenu UserEmail="@context.User.Identity!.Name" />
             </Authorized>
         </AuthorizeView>
     </FluentHeader>
@@ -32,7 +32,6 @@
     <a class="dismiss">🗙</a>
 </div>
 
-<FluentTooltipProvider />
 <FluentToastProvider RemoveToastsOnNavigation="false" Position="ToastPosition.BottomCenter" @rendermode="RenderMode.InteractiveServer" />
 <FluentDialogProvider @rendermode="RenderMode.InteractiveServer" />
 <FluentTooltipProvider @rendermode="RenderMode.InteractiveServer" />

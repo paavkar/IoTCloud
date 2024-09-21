@@ -114,7 +114,7 @@
 
         if (!dialogResult.Cancelled)
         {
-            var result = await UserService.DeleteUserApiKeyAsync(ApiKey!);
+            var result = await UserService.DeleteUserApiKeyAsync(ApiKey!, user.Id);
 
             if (result)
             {
@@ -256,6 +256,7 @@
     private async void DeleteSensor(string id)
     {
         var sensor = Sensors.Find(s => s.Id == id);
+        Console.WriteLine(sensor.Name);
         var dialog = await DialogService.ShowConfirmationAsync($"Do you want to delete sensor {sensor!.Name}? {Environment.NewLine}" + 
                     "WARNING: THIS WILL DELETE ALL OF THIS SENSOR'S DATA AND VISUALISATIONS", "Yes", "No", "Delete API Key confirmation");
 
@@ -263,7 +264,7 @@
 
         if (!dialogResult.Cancelled)
         {
-            var result = await SensorsService.DeleteSensor(id, sensor.Name);
+            var result = await SensorsService.DeleteSensor(id, sensor.Name, user.Id);
 
             if (result)
             {
