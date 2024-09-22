@@ -18,7 +18,7 @@ namespace IoTCloud.Controllers
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
 
-            var sensorExists = await sensorsService.CheckSensorExists(sensorName, existingKey.UserId);
+            var sensorExists = await sensorsService.CheckSensorExists(sensorName.ToLower(), existingKey.UserId);
 
             if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
@@ -42,11 +42,11 @@ namespace IoTCloud.Controllers
 
             if (existingKey is null) return Unauthorized("API key is invalid.");
 
-            var sensorExists = await sensorsService.CheckSensorExists(sensorName, existingKey.UserId);
+            var sensorExists = await sensorsService.CheckSensorExists(sensorName.ToLower(), existingKey.UserId);
 
             if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
-            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName, existingKey.UserId, DateTimeOffset.Now, ReadingType.Distance);
+            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName.ToLower(), existingKey.UserId, DateTimeOffset.Now, ReadingType.Distance);
 
             if (!isOperationSuccessful)
             {
