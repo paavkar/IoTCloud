@@ -65,6 +65,7 @@
             <PropertyColumn Title="Sensor modification time" Property="@(s => s.ModifiedAt)" Sortable="true" />
             <PropertyColumn Title="Sensor's data type" Property="@(s => s.ReadingType)" Sortable="true" />
             <TemplateColumn Title="Actions">
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" OnClick="@(e => EditSensor(context.Id))" />
                 <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(e => DeleteSensor(context.Id))" />
             </TemplateColumn>
         </FluentDataGrid>
@@ -202,7 +203,7 @@
 
     private async void AddSensor()
     {
-        Sensor sensor = new() { UserId = user.Id, ApiKey = ApiKey, CreatedAt = DateTimeOffset.Now };
+        Sensor sensor = new() { UserId = user.Id, ApiKey = ApiKey };
 
         var dialog = await DialogService.ShowDialogAsync<SensorFormDialog>(sensor, new DialogParameters()
         {
@@ -247,6 +248,60 @@
                         Content = new CommunicationToastContent()
                         {
                             Details = $"There was an error adding the sensor.",
+                        }
+                    });
+            }
+        }
+    }
+
+    private async void EditSensor(string id)
+    {
+        var originalSensor = Sensors.Find(s => s.Id == id);
+        var originalSensorName = originalSensor.Name;
+        var sensor = Sensors.Find(s => s.Id == id);
+
+        var dialog = await DialogService.ShowDialogAsync<SensorFormDialog>(sensor, new DialogParameters()
+            {
+                Height = "400px",
+                Width = "400px",
+                Title = $"Add a new Sensor",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+                ShowDismiss = false
+            });
+
+        var result = await dialog.Result;
+
+        if (!result.Cancelled && result.Data != null)
+        {
+            sensor = (Sensor)result.Data;
+
+            var addResult = await SensorsService.EditSensor(sensor, originalSensorName);
+
+            if (addResult)
+            {
+                await InvokeAsync(StateHasChanged);
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Success,
+                        Title = "Edit Sensor result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = $"The original {originalSensor.ReadingType} sensor {originalSensorName} is now {sensor.ReadingType} sensor {sensor.Name}.",
+                        }
+                    });
+            }
+            else
+            {
+                ToastService.ShowCommunicationToast(new ToastParameters<CommunicationToastContent>()
+                    {
+                        Intent = ToastIntent.Error,
+                        Title = "Edit Sensor result",
+                        Timeout = 5000,
+                        Content = new CommunicationToastContent()
+                        {
+                            Details = $"There was an error editing the sensor.",
                         }
                     });
             }

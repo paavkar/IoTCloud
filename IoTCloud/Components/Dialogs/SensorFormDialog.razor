@@ -23,7 +23,9 @@
     <FluentStack Orientation="Orientation.Vertical">
         <FluentLabel Color="Color.Error">@Message</FluentLabel>
 
-        <FluentRadioGroup Style="margin-top: 1em;" @bind-Value=Content.ReadingType Label="Reading type of the data">
+        @if (string.IsNullOrEmpty(Content.Name))
+        {
+            <FluentRadioGroup Style="margin-top: 1em;" @bind-Value=Sensor.ReadingType Label="Reading type of the data">
             @foreach (ReadingType item in Enum.GetValues<ReadingType>())
             {
                 if (item != ReadingType.Binary)
@@ -31,9 +33,22 @@
                     <FluentRadio Value="@item">@item</FluentRadio>
                 }
             }
-        </FluentRadioGroup>
+            </FluentRadioGroup>
+        }
+        else
+        {
+            <FluentRadioGroup Style="margin-top: 1em;" @bind-Value=Sensor.ReadingType Label="Reading type of the data" Disabled>
+                @foreach (ReadingType item in Enum.GetValues<ReadingType>())
+                {
+                    if (item != ReadingType.Binary)
+                    {
+                        <FluentRadio Value="@item">@item</FluentRadio>
+                    }
+                }
+            </FluentRadioGroup>
+        }
 
-        <FluentTextField Style="margin-top: 1em;" Label="Name for the sensor" @bind-Value=Content.Name />
+        <FluentTextField Style="margin-top: 1em;" Label="Name for the sensor" @bind-Value=Sensor.Name />
     </FluentStack>
 </FluentDialogBody>
 
@@ -45,6 +60,7 @@
     private ApplicationUser user = default!;
     [Parameter]
     public Sensor Content { get; set; } = default!;
+    public Sensor Sensor { get; set; } = new();
 
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
@@ -52,14 +68,24 @@
     protected override async Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync();
+        if (!string.IsNullOrEmpty(Content.Name))
+        {
+            Sensor.Name = Content.Name;
+            Sensor.ReadingType = Content.ReadingType;
+        }
     }
 
     private async Task SaveAsync()
     {
-        var sensorAlreadyExists = await SensorsService.CheckSensorExists(Content.Name, user.Id);
+        var sensorAlreadyExists = await SensorsService.CheckSensorExists(Sensor.Name.Trim().ToLower(), user.Id);
 
-        if (!sensorAlreadyExists) await Dialog.CloseAsync(Content);
-        else Message = $"You already have a sensor with the name {Content.Name}. Choose a different name.";
+        if (!sensorAlreadyExists)
+        {
+            Content.Name = Sensor.Name.Trim().ToLower();
+            Content.ReadingType = Sensor.ReadingType;
+            await Dialog.CloseAsync(Content);
+        }
+        else Message = $"You already have a sensor with the name {Sensor.Name}. Choose a different name.";
     }
 
     private async Task CancelAsync()
