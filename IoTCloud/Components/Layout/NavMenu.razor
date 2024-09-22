@@ -16,6 +16,10 @@
                     <FluentNavLink Href="Dashboard" Icon="@(new Icons.Regular.Size20.Board())">Dashboard</FluentNavLink>
                     <FluentNavLink Href="Visualisations" Icon="@(new Icons.Regular.Size20.ChartMultiple())">Data visualisations</FluentNavLink>
                     <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.Person())">@context.User.Identity?.Name</FluentNavLink>
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    </form>
                 </Authorized>
                 <NotAuthorized>
                     <FluentNavLink Icon="@(new Icons.Regular.Size20.PersonAdd())" Href="Account/Register">Register</FluentNavLink>

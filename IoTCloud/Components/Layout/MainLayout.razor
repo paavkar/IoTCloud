@@ -7,7 +7,7 @@
         <FluentSpacer />
         <AuthorizeView>
             <Authorized>
-                <UserProfileMenu UserEmail="@context.User.Identity!.Name" />
+                <UserProfileMenu UserEmail=@context.User.Identity?.Name />
             </Authorized>
         </AuthorizeView>
     </FluentHeader>
