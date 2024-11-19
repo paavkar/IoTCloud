@@ -243,15 +243,13 @@ else
             {
                 await GetReadings(graph);
             }
-            await InvokeAsync(StateHasChanged);
         }
-        else if (Tables.Count > 0)
+        if (Tables.Count > 0)
         {
             foreach (var table in Tables)
             {
                 await GetReadings(table);
             }
-            await InvokeAsync(StateHasChanged);
         }
         if (BinaryGraphs.Count > 0)
         {
@@ -259,8 +257,8 @@ else
             {
                 await GetBinaryReadings();
             }
-            await InvokeAsync(StateHasChanged);
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task GetReadings(GraphItem item)
