@@ -1,4 +1,6 @@
-﻿<FluentStack Orientation="Orientation.Vertical">
+﻿@inject IJSRuntime JS
+
+<FluentStack Orientation="Orientation.Vertical">
     @foreach (var item in Graphs)
     {
         switch (item.DataType)
@@ -12,7 +14,9 @@
                         <ApexCharts.ApexPointSeries TItem="DistanceReading"
                                                     Items="DistanceReadings.Where(dr => dr.SensorName == item.SensorName).OrderBy(dr => dr.TimeOfMeasurement)"
                                                     SeriesType=item.GraphType
-                                                    XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
+                                                    XValue="i => i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortDateString()
+                                                        + Environment.NewLine + i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortTimeString()
+                                                        + (TimeZoneString)"
                                                     YValue="i => (decimal)i.Distance" />
                     </ApexCharts.ApexChart>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -27,7 +31,9 @@
                         <ApexCharts.ApexPointSeries TItem="LuminosityReading"
                                                     Items="LuminosityReadings.Where(lr => lr.SensorName == item.SensorName).OrderBy(lr => lr.TimeOfMeasurement)"
                                                     SeriesType=item.GraphType
-                                                    XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
+                                                    XValue="i => i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortDateString()
+                                                        + Environment.NewLine + i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortTimeString()
+                                                        + (TimeZoneString)"
                                                     YValue="i => (decimal)i.Luminosity" />
                     </ApexCharts.ApexChart>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -42,7 +48,9 @@
                         <ApexCharts.ApexPointSeries TItem="TemperatureReading"
                                                     Items="TemperatureReadings.Where(tr => tr.SensorName == item.SensorName).OrderBy(tr => tr.TimeOfMeasurement)"
                                                     SeriesType=item.GraphType
-                                                    XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
+                                                    XValue="i => i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortDateString()
+                                                        + Environment.NewLine + i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortTimeString()
+                                                        + (TimeZoneString)"
                                                     YValue="i => (decimal)i.Temperature" />
                     </ApexCharts.ApexChart>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -57,13 +65,15 @@
                         <ApexCharts.ApexPointSeries TItem="VelocityReading"
                                                     Items="VelocityReadings.Where(vr => vr.SensorName == item.SensorName).OrderBy(vr => vr.TimeOfMeasurement)"
                                                     SeriesType=item.GraphType
-                                                    XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
+                                                    XValue="i => i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortDateString()
+                                                        + Environment.NewLine + i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortTimeString()
+                                                        + (TimeZoneString)"
                                                     YValue="i => (decimal)i.Velocity" />
                     </ApexCharts.ApexChart>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
                 </FluentStack>
                 break;
-        case "HumidityReading":
+            case "HumidityReading":
                 <FluentStack>
                     <ApexCharts.ApexChart TItem="HumidityReading"
                                           Title=@item.Name
@@ -72,7 +82,9 @@
                         <ApexCharts.ApexPointSeries TItem="HumidityReading"
                                                     Items="HumidityReadings.Where(hr => hr.SensorName == item.SensorName).OrderBy(hr => hr.TimeOfMeasurement)"
                                                     SeriesType=item.GraphType
-                                                    XValue="i => i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortDateString() + Environment.NewLine + i.TimeOfMeasurement.ToLocalTime().DateTime.ToShortTimeString()"
+                                                    XValue="i => i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortDateString()
+                                                        + Environment.NewLine + i.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime.ToShortTimeString()
+                                                        + (TimeZoneString)"
                                                     YValue="i => (decimal)i.Humidity" />
                     </ApexCharts.ApexChart>
                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveGraph(item.Id))">Remove Graph @item.Name</FluentButton>
@@ -104,28 +116,31 @@
     private ApexCharts.ApexChart<VelocityReading> VelocityChart = new();
     private ApexCharts.ApexChart<HumidityReading> HumidityChart = new();
 
+    private double TimeZoneOffset { get; set; }
+    private string TimeZoneString { get; set; } = "";
+
     private ApexCharts.ApexChartOptions<TemperatureReading> options { get; set; } = new();
 
     protected override void OnInitialized()
     {
         options = new()
-        {
-            Xaxis = new() 
-            { 
-                Labels = new() 
-                { 
-                    OffsetX = 0,
+            {
+                Xaxis = new()
+                {
+                    Labels = new()
+                    {
+                        OffsetX = 0,
+                    }
+                },
+                Markers = new()
+                {
+                    Size = 6,
+                    Hover = new()
+                    {
+                        Size = 6
+                    }
                 }
-            },
-            Markers = new() 
-            { 
-                Size = 6, 
-                Hover = new() 
-                { 
-                    Size = 6 
-                } 
-            }
-        };
+            };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -138,6 +153,9 @@
             await VelocityChart.UpdateSeriesAsync(true);
             await HumidityChart.UpdateSeriesAsync(true);
         }
+
+        TimeZoneOffset = await JS.InvokeAsync<double>("getTimezone");
+        TimeZoneString = TimeZoneOffset < 0 ? $" UTC{TimeZoneOffset}" : $" UTC+{TimeZoneOffset}";
     }
 
     private async Task RemoveGraph(string id)

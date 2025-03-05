@@ -22,7 +22,7 @@ namespace IoTCloud.Controllers
 
             if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
-            var isOperationSuccessful = await readingsService.AddVelocityReading(velocity, sensorName, existingKey.UserId, DateTimeOffset.Now);
+            var isOperationSuccessful = await readingsService.AddVelocityReading(velocity, sensorName, existingKey.UserId, DateTimeOffset.UtcNow);
 
             if (!isOperationSuccessful)
             {
@@ -46,7 +46,7 @@ namespace IoTCloud.Controllers
 
             if (!sensorExists) return BadRequest($"Sensor with the name {sensorName} does not exist");
 
-            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName.ToLower(), existingKey.UserId, DateTimeOffset.Now, ReadingType.Velocity);
+            var isOperationSuccessful = await readingsService.AddBinaryReading(binary, sensorName.ToLower(), existingKey.UserId, DateTimeOffset.UtcNow, ReadingType.Velocity);
 
             if (!isOperationSuccessful)
             {
