@@ -188,7 +188,6 @@ namespace IoTCloud.Services
 
                             await connection.ExecuteAsync(updateEmailNotificationsSql, new { sensor.UserId, SensorName = sensor.Name, OldSensorName = oldSensorName }, transaction);
 
-
                             transaction.Commit();
 
                             return sensorUpdated > 0;

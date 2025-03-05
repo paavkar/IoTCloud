@@ -13,6 +13,7 @@
 @inject IGraphsService GS
 @inject IToastService ToastService
 @inject ISensorsService SensorsService
+@inject IJSRuntime JS
 
 @attribute [Authorize]
 
@@ -76,7 +77,17 @@
                                 <FluentStack>
                                     <FluentDataGrid Items="@DistanceReadings.Where(dr => dr.SensorName == table.SensorName).AsQueryable()">
                                         <PropertyColumn Title="Distance" Property="@(t => t.Distance)" Sortable="true" />
-                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <TemplateColumn Title="Time of measurement" Sortable="true" Align="Align.Center">
+                                            @context.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime
+                                            @if (TimeZoneOffset < 0)
+                                            {
+                                                <span> UTC @TimeZoneOffset</span>
+                                            }
+                                            else
+                                            {
+                                                <span> UTC+@TimeZoneOffset</span>
+                                            }
+                                        </TemplateColumn>
                                         <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                                     </FluentDataGrid>
                                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -86,7 +97,17 @@
                                 <FluentStack>
                                     <FluentDataGrid Items="@LuminosityReadings.Where(lr => lr.SensorName == table.SensorName).AsQueryable()">
                                         <PropertyColumn Title="Luminosity" Property="@(t => t.Luminosity)" Sortable="true" />
-                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <TemplateColumn Title="Time of measurement" Sortable="true" Align="Align.Center">
+                                            @context.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime
+                                            @if (TimeZoneOffset < 0)
+                                            {
+                                                <span> UTC@TimeZoneOffset</span>
+                                            }
+                                            else
+                                            {
+                                                <span> UTC+@TimeZoneOffset</span>
+                                            }
+                                        </TemplateColumn>
                                         <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                                     </FluentDataGrid>
                                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -96,7 +117,17 @@
                                 <FluentStack>
                                     <FluentDataGrid Items="@TemperatureReadings.Where(tr => tr.SensorName == table.SensorName).AsQueryable()">
                                         <PropertyColumn Title="Temperature" Property="@(t => t.Temperature)" Sortable="true" />
-                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <TemplateColumn Title="Time of measurement" Sortable="true" Align="Align.Center">
+                                            @context.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime
+                                            @if (TimeZoneOffset < 0)
+                                            {
+                                                <span> UTC @TimeZoneOffset</span>
+                                            }
+                                            else
+                                            {
+                                                <span> UTC+@TimeZoneOffset</span>
+                                            }
+                                        </TemplateColumn>
                                         <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                                     </FluentDataGrid>
                                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -106,7 +137,17 @@
                                 <FluentStack>
                                     <FluentDataGrid Items="@VelocityReadings.Where(vr => vr.SensorName == table.SensorName).AsQueryable()">
                                         <PropertyColumn Title="Velocity" Property="@(t => t.Velocity)" Sortable="true" />
-                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <TemplateColumn Title="Time of measurement" Sortable="true" Align="Align.Center">
+                                            @context.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime
+                                            @if (TimeZoneOffset < 0)
+                                            {
+                                                <span> UTC @TimeZoneOffset</span>
+                                            }
+                                            else
+                                            {
+                                                <span> UTC+@TimeZoneOffset</span>
+                                            }
+                                        </TemplateColumn>
                                         <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                                     </FluentDataGrid>
                                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -116,7 +157,17 @@
                                 <FluentStack>
                                     <FluentDataGrid Items="@HumidityReadings.Where(hr => hr.SensorName == table.SensorName).AsQueryable()">
                                         <PropertyColumn Title="Humidity" Property="@(t => t.Humidity)" Sortable="true" />
-                                        <PropertyColumn Title="Time of measurement" Property="@(t => t.TimeOfMeasurement.ToLocalTime())" Sortable="true" />
+                                        <TemplateColumn Title="Time of measurement" Sortable="true" Align="Align.Center">
+                                            @context.TimeOfMeasurement.AddHours(TimeZoneOffset).DateTime
+                                            @if (TimeZoneOffset < 0)
+                                            {
+                                                <span> UTC @TimeZoneOffset</span>
+                                            }
+                                            else
+                                            {
+                                                <span> UTC+@TimeZoneOffset</span>
+                                            }
+                                        </TemplateColumn>
                                         <PropertyColumn Title="Sensor name" Property="@(t => t.SensorName)" Sortable="true" />
                                     </FluentDataGrid>
                                     <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveTable(table.Id))">Remove Table @table.Name</FluentButton>
@@ -143,6 +194,7 @@
                     {
                         BinaryReading item = new List<BinaryReading> { BinaryReadings.Where(br => br.SensorName == graph.SensorName && br.ReadingType == graph.ReadingType).First() }.First();
                         <FluentStack Style="margin-top: 1em;">
+                            <span>@graph.Name</span>
                             @if (item.Binary == 1)
                             {
                                 <span style="height: 250px; width: 250px; background-color: red; border-radius: 50%; display: inline-block;"><strong>@item.SensorName</strong></span>
@@ -157,6 +209,7 @@
                     else
                     {
                         <FluentStack Style="margin-top: 1em;">
+                            <span>@graph.Name</span>
                             <span style="height: 250px; width: 250px; background-color: grey; border-radius: 50%; display: inline-block;"></span>
                             <FluentButton BackgroundColor="red" Color="white" Appearance="Appearance.Accent" OnClick="@(e => RemoveBinaryGraph(graph.Id))">Remove Graph @graph.Name</FluentButton>
                         </FluentStack>
@@ -194,6 +247,8 @@ else
     private List<VelocityReading> VelocityReadings { get; set; } = new();
     private List<BinaryReading> BinaryReadings { get; set; } = new();
     private List<HumidityReading> HumidityReadings { get; set; } = new();
+
+    private double TimeZoneOffset { get; set; }
 
     private System.Timers.Timer timer = new(15000);
 
@@ -233,6 +288,11 @@ else
         timer.Elapsed += OnTimedEvent;
         timer.AutoReset = true;
         timer.Start();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        TimeZoneOffset = await JS.InvokeAsync<double>("getTimezone");
     }
 
     private async void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -308,7 +368,6 @@ else
     private async Task GetBinaryReadings()
     {
         BinaryReadings = await RS.GetBinaryReadings(user.Id);
-        await InvokeAsync(StateHasChanged);
     }
 
     public async void CreateApiKey()
