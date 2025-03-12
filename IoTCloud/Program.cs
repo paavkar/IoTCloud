@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components.Components.Tooltip;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -41,8 +41,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, options =>
     {
         options.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(20),
+            maxRetryCount: int.Parse(builder.Configuration["DATABASE_RETRY_COUNT"]!),
+            maxRetryDelay: TimeSpan.FromSeconds(int.Parse(builder.Configuration["DATABASE_RETRY_DELAY"]!)),
             errorNumbersToAdd: null);
     }));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -56,7 +56,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
